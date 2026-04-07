@@ -1,1 +1,8 @@
-{}
+{
+  "crons": [
+    {
+      "path": "/api/libraries?stdgCd=1100000000",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}

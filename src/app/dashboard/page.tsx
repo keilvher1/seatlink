@@ -82,7 +82,7 @@ export default function DashboardPage() {
                   boxShadow: "0 4px 20px rgba(0,0,0,0.1)"
                 }}
               />
-              <Bar dataKey="usage" radius={[12, 12, 0, 0]}>
+              <Bar dataKey="usageRate" radius={[12, 12, 0, 0]}>
                 {mockRegionUsage.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.usageRate > 70 ? "#ef4444" : entry.usageRate > 50 ? "#f59e0b" : "#22c55e"} />
                 ))}
@@ -97,11 +97,12 @@ export default function DashboardPage() {
         <h3 className="font-bold text-slate-900 mb-4 text-lg">📈 요일별 혼잡도 히트맵</h3>
         <div className="grid grid-cols-7 gap-2">
           {mockWeeklyHeatmap.map((item, idx) => {
-            const intensity = (item.value / 100) * 100;
+            const avg = item.hours.reduce((a: number, b: number) => a + b, 0) / item.hours.length;
+            const intensity = avg;
             const color = intensity < 33 ? "bg-emerald-400" : intensity < 66 ? "bg-amber-400" : "bg-red-400";
             return (
               <div key={idx} className="text-center">
-                <div className={cn("w-full aspect-square rounded-lg shadow-md transition-all hover:scale-110 cursor-pointer", color, "opacity-70 hover:opacity-100")} title={`${item.day} ${item.value}%`} />
+                <div className={cn("w-full aspect-square rounded-lg shadow-md transition-all hover:scale-110 cursor-pointer", color, "opacity-70 hover:opacity-100")} title={`${item.day} ${Math.round(avg)}%`} />
                 <p className="text-xs text-slate-600 mt-2 font-medium">{item.day}</p>
               </div>
             );
