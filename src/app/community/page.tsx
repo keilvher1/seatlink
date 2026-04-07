@@ -10,21 +10,31 @@ export default function CommunityPage() {
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]>("💬 한줄 후기");
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto pb-24 md:pb-0">
+      {/* 헤더 */}
+      <div className="px-4 py-6 text-center border-b border-slate-200/50 bg-gradient-to-b from-blue-50 to-transparent">
+        <h1 className="text-3xl font-bold gradient-text">커뮤니티</h1>
+        <p className="text-sm text-slate-500 mt-2">도서관 이용자들과 경험을 나누어보세요</p>
+      </div>
+
       {/* 탭 */}
-      <div className="sticky top-14 z-30 bg-white border-b border-slate-200 flex">
-        {TABS.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={cn(
-              "flex-1 py-3 text-sm font-medium transition",
-              activeTab === tab ? "tab-active" : "text-slate-400 hover:text-slate-600"
-            )}
-          >
-            {tab}
-          </button>
-        ))}
+      <div className="sticky top-14 z-30 glass">
+        <div className="flex">
+          {TABS.map((tab, idx) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={cn(
+                "flex-1 py-4 text-sm font-semibold transition-all duration-300",
+                activeTab === tab 
+                  ? "tab-active bg-gradient-to-b from-blue-50 to-transparent" 
+                  : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="p-4">
@@ -44,37 +54,37 @@ function ShortReviewTab() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-slide-up">
       {/* 작성 영역 */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4">
+      <div className="glass rounded-2xl p-5">
         <div className="flex items-start gap-3">
-          <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-md">
             나
           </div>
           <div className="flex-1">
             <textarea
               placeholder="지금 이용 중인 도서관의 분위기를 알려주세요..."
-              className="w-full resize-none border-0 bg-transparent text-sm placeholder:text-slate-400 focus:ring-0 p-0"
+              className="w-full resize-none border-0 bg-transparent text-sm placeholder:text-slate-400 focus:ring-0 p-0 font-medium text-slate-700"
               rows={2}
             />
-            <div className="flex flex-wrap gap-1.5 mt-2">
+            <div className="flex flex-wrap gap-1.5 mt-3">
               {moods.map((mood) => (
                 <button
                   key={mood}
                   onClick={() => setSelectedMood(selectedMood === mood ? null : mood)}
                   className={cn(
-                    "px-2.5 py-1 text-xs rounded-full border transition",
+                    "px-3 py-1 text-xs font-semibold rounded-full transition-all duration-300 transform",
                     selectedMood === mood
-                      ? "bg-blue-50 border-blue-300 text-blue-700"
-                      : "bg-slate-50 border-slate-200 text-slate-600 hover:border-blue-200"
+                      ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-500/30 scale-105"
+                      : "glass text-slate-700 hover:scale-105"
                   )}
                 >
                   {mood}
                 </button>
               ))}
             </div>
-            <div className="flex justify-end mt-3">
-              <button className="px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-full hover:bg-blue-700 transition">
+            <div className="flex justify-end mt-4">
+              <button className="px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all transform hover:scale-105">
                 게시하기
               </button>
             </div>
@@ -83,26 +93,26 @@ function ShortReviewTab() {
       </div>
 
       {/* 피드 */}
-      {mockReviews.map((review) => (
-        <div key={review.id} className="bg-white rounded-xl border border-slate-100 p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+      {mockReviews.map((review, idx) => (
+        <div key={review.id} className="glass rounded-2xl p-4 hover:shadow-lg transition-all duration-300 animate-slide-up" style={{ animationDelay: `${idx * 50}ms` }}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md">
               {review.userName[0]}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-slate-900">{review.userName}</span>
-                <span className="text-xs text-slate-400">{review.createdAt}</span>
+                <span className="text-sm font-bold text-slate-900">{review.userName}</span>
+                <span className="text-xs text-slate-500">{review.createdAt}</span>
               </div>
-              <p className="text-xs text-slate-500 truncate">{review.libraryName} {review.roomName || ""}</p>
+              <p className="text-xs text-slate-600 truncate font-medium">{review.libraryName} {review.roomName || ""}</p>
             </div>
-            <span className="px-2 py-0.5 bg-slate-100 text-xs rounded-full text-slate-600 shrink-0">{review.mood}</span>
+            <span className="px-2.5 py-1 badge-pill bg-slate-200/60 text-slate-700 text-xs font-semibold shrink-0">{review.mood}</span>
           </div>
-          <p className="text-sm text-slate-700 leading-relaxed">{review.content}</p>
-          <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
-            <button className="flex items-center gap-1 hover:text-blue-600 transition">👍 {review.helpful}</button>
-            <button className="flex items-center gap-1 hover:text-blue-600 transition">💬 {review.comments}</button>
-            <button className="flex items-center gap-1 hover:text-blue-600 transition">📌 저장</button>
+          <p className="text-sm text-slate-700 leading-relaxed font-medium">{review.content}</p>
+          <div className="flex items-center gap-4 mt-3 text-xs text-slate-600">
+            <button className="flex items-center gap-1 hover:text-blue-600 font-medium transition">👍 {review.helpful}</button>
+            <button className="flex items-center gap-1 hover:text-blue-600 font-medium transition">💬 {review.comments}</button>
+            <button className="flex items-center gap-1 hover:text-blue-600 font-medium transition">📌 저장</button>
           </div>
         </div>
       ))}
@@ -136,46 +146,46 @@ function DetailReviewTab() {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-slide-up">
       {/* 필터 */}
       <div className="flex items-center gap-2">
-        <select className="text-sm bg-white border border-slate-200 rounded-lg px-3 py-1.5">
+        <select className="text-sm glass rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 font-medium text-slate-700">
           <option>전체 지역</option>
           <option>서울</option>
           <option>경기</option>
           <option>부산</option>
         </select>
-        <select className="text-sm bg-white border border-slate-200 rounded-lg px-3 py-1.5">
+        <select className="text-sm glass rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 font-medium text-slate-700">
           <option>최신순</option>
           <option>평점순</option>
           <option>도움순</option>
         </select>
       </div>
 
-      {detailReviews.map((review) => (
-        <div key={review.id} className="bg-white rounded-xl border border-slate-100 p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+      {detailReviews.map((review, idx) => (
+        <div key={review.id} className="glass rounded-2xl p-5 hover:shadow-lg transition-all duration-300 animate-slide-up" style={{ animationDelay: `${idx * 50}ms` }}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md">
                 {review.userName[0]}
               </div>
               <div>
-                <span className="text-sm font-semibold">{review.userName}</span>
-                <span className="text-xs text-slate-400 ml-2">{review.createdAt}</span>
+                <span className="text-sm font-bold text-slate-900">{review.userName}</span>
+                <span className="text-xs text-slate-500 ml-2">{review.createdAt}</span>
               </div>
             </div>
             <div className="flex gap-0.5">
               {[1, 2, 3, 4, 5].map((s) => (
-                <svg key={s} className={cn("w-4 h-4", s <= review.rating ? "text-amber-400" : "text-slate-200")} fill="currentColor" viewBox="0 0 24 24">
+                <svg key={s} className={cn("w-4 h-4 transition", s <= review.rating ? "text-amber-400 shadow-md shadow-amber-400/50" : "text-slate-300")} fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
               ))}
             </div>
           </div>
-          <p className="text-xs text-blue-600 font-medium mb-2">{review.libraryName}</p>
+          <p className="text-xs font-bold gradient-text mb-3">{review.libraryName}</p>
 
           {/* 카테고리 평점 미니 */}
-          <div className="grid grid-cols-4 gap-2 mb-3">
+          <div className="grid grid-cols-4 gap-2 mb-4 p-3 bg-slate-50/60 rounded-xl">
             {[
               { label: "청결", score: review.ratings.clean },
               { label: "소음", score: review.ratings.noise },
@@ -183,16 +193,16 @@ function DetailReviewTab() {
               { label: "시설", score: review.ratings.facility },
             ].map((r) => (
               <div key={r.label} className="text-center">
-                <p className="text-[10px] text-slate-500">{r.label}</p>
-                <p className="text-sm font-semibold text-amber-600">{r.score}</p>
+                <p className="text-[10px] text-slate-600 font-semibold">{r.label}</p>
+                <p className="text-sm font-bold gradient-text">{r.score}</p>
               </div>
             ))}
           </div>
 
-          <p className="text-sm text-slate-700 leading-relaxed">{review.content}</p>
+          <p className="text-sm text-slate-700 leading-relaxed font-medium">{review.content}</p>
 
-          <div className="flex items-center mt-3 text-xs text-slate-500">
-            <button className="hover:text-blue-600 transition">👍 도움이 됐어요 {review.helpful}</button>
+          <div className="flex items-center mt-3 text-xs text-slate-600">
+            <button className="hover:text-blue-600 font-medium transition">👍 도움이 됐어요 {review.helpful}</button>
           </div>
         </div>
       ))}
@@ -205,30 +215,30 @@ function DetailReviewTab() {
 // ========================
 function StudyMatchTab() {
   return (
-    <div className="space-y-4">
-      <button className="w-full py-3 border-2 border-dashed border-blue-300 text-blue-600 font-semibold rounded-xl hover:bg-blue-50 transition">
+    <div className="space-y-4 animate-slide-up">
+      <button className="w-full py-4 border-2 border-dashed border-blue-400 text-blue-600 font-bold rounded-2xl hover:bg-blue-50/50 hover:border-blue-500 transition-all transform hover:scale-105 text-lg">
         📚 스터디 그룹 만들기
       </button>
 
-      {mockStudyGroups.map((group) => (
-        <div key={group.id} className="bg-white rounded-xl border border-slate-100 p-4">
-          <h3 className="font-bold text-slate-900">{group.title}</h3>
-          <div className="mt-2 space-y-1 text-sm text-slate-600">
+      {mockStudyGroups.map((group, idx) => (
+        <div key={group.id} className="glass rounded-2xl p-5 hover:shadow-lg transition-all duration-300 animate-slide-up" style={{ animationDelay: `${idx * 50}ms` }}>
+          <h3 className="font-bold text-slate-900 text-lg mb-3">{group.title}</h3>
+          <div className="space-y-2 text-sm text-slate-700 mb-3 font-medium">
             <p>📍 {group.libraryName} {group.location}</p>
-            <p>👥 {group.currentMembers}/{group.maxMembers}명 참여 중 &nbsp;|&nbsp; 🗓️ {group.schedule}</p>
+            <p>👥 <span className="font-bold">{group.currentMembers}명</span> / {group.maxMembers}명 &nbsp;|&nbsp; 🗓️ {group.schedule}</p>
             <p>🕐 {group.time}</p>
           </div>
-          <p className="text-sm text-slate-700 mt-2 leading-relaxed">{group.description}</p>
-          <div className="flex flex-wrap gap-1.5 mt-2">
+          <p className="text-sm text-slate-700 leading-relaxed font-medium">{group.description}</p>
+          <div className="flex flex-wrap gap-2 mt-3 mb-4">
             {group.tags.map((tag) => (
-              <span key={tag} className="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-full font-medium">#{tag}</span>
+              <span key={tag} className="px-3 py-1 badge-pill bg-blue-100 text-blue-700 text-xs font-bold">#{tag}</span>
             ))}
           </div>
-          <div className="flex gap-2 mt-3">
-            <button className="flex-1 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition">
+          <div className="flex gap-2">
+            <button className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all transform hover:scale-105">
               참여 신청하기
             </button>
-            <button className="px-4 py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition">
+            <button className="px-4 py-3 glass rounded-xl text-slate-700 text-sm font-semibold hover:shadow-md transition">
               상세보기
             </button>
           </div>
