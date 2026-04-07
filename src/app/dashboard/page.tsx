@@ -56,7 +56,7 @@ export default function DashboardPage() {
               />
               <Area 
                 type="monotone" 
-                dataKey="usage" 
+                dataKey="usageRate" 
                 stroke="#2563eb" 
                 strokeWidth={3}
                 fillOpacity={1} 
@@ -84,7 +84,7 @@ export default function DashboardPage() {
               />
               <Bar dataKey="usage" radius={[12, 12, 0, 0]}>
                 {mockRegionUsage.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={getCongestionHex(entry.level)} />
+                  <Cell key={`cell-${index}`} fill={entry.usageRate > 70 ? "#ef4444" : entry.usageRate > 50 ? "#f59e0b" : "#22c55e"} />
                 ))}
               </Bar>
             </BarChart>
