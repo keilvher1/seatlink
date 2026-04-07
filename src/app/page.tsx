@@ -1,14 +1,23 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { mockLibraries } from "@/lib/mock-data";
 import { getCongestionColor, cn } from "@/lib/utils";
 import { LibraryWithDistance, CongestionLevel } from "@/lib/types";
 
+declare global {
+  interface Window {
+    kakao: any;
+  }
+}
+
 export default function HomePage() {
   const [radius, setRadius] = useState(5);
   const [sortBy, setSortBy] = useState<"distance" | "seats">("distance");
-  const [sheetOpen, setSheetOpen] = useState(true);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
 
   const sorted = useMemo(() => {
     const list = [...mockLibraries].filter((l) => l.distance <= radius);
@@ -17,18 +26,106 @@ export default function HomePage() {
     return list;
   }, [radius, sortBy]);
 
+  const updateMarkers = useCallback((map: any, kakao: any, libs: LibraryWithDistance[]) => {
+    markersRef.current.forEach((m) => m.setMap(null));
+    markersRef.current = [];
+
+    const colorMap: Record<string, string> = {
+      "\uc5ec\uc720": "#22c55e",
+      "\ubcf4\ud1b5": "#f59e0b",
+      "\ud63c\uc7a1": "#ef4444",
+    };
+
+    libs.forEach((lib) => {
+      const color = colorMap[lib.congestionLevel] || "#3b82f6";
+      const el = document.createElement("div");
+      const link = document.createElement("a");
+      link.href = "/library/" + lib.id;
+      link.style.cssText = "text-decoration:none;display:flex;flex-direction:column;align-items:center;cursor:pointer;";
+
+      const circle = document.createElement("div");
+      circle.style.cssText = "width:48px;height:48px;background:" + color + ";border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:13px;border:3px solid white;box-shadow:0 4px 12px " + color + "66;transition:transform 0.2s;";
+      circle.textContent = String(lib.totalAvailable);
+      circle.onmouseover = () => { circle.style.transform = "scale(1.15)"; };
+      circle.onmouseout = () => { circle.style.transform = "scale(1)"; };
+
+      const arrow = document.createElement("div");
+      arrow.style.cssText = "width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid white;margin-top:-2px;";
+
+      const label = document.createElement("div");
+      label.style.cssText = "background:white;padding:2px 8px;border-radius:8px;margin-top:2px;box-shadow:0 2px 8px rgba(0,0,0,0.1);white-space:nowrap;";
+      const labelText = document.createElement("span");
+      labelText.style.cssText = "font-size:11px;font-weight:600;color:#334155;";
+      labelText.textContent = lib.name;
+      label.appendChild(labelText);
+
+      link.appendChild(circle);
+      link.appendChild(arrow);
+      link.appendChild(label);
+      el.appendChild(link);
+
+      const overlay = new kakao.maps.CustomOverlay({
+        position: new kakao.maps.LatLng(lib.lat, lib.lng),
+        content: el,
+        yAnchor: 1.2,
+        map,
+      });
+
+      markersRef.current.push(overlay);
+    });
+  }, []);
+
+  // Kakao Map init
+  useEffect(() => {
+    const initMap = () => {
+      if (!mapRef.current || !window.kakao?.maps) return;
+
+      window.kakao.maps.load(() => {
+        const center = new window.kakao.maps.LatLng(37.5665, 126.978);
+        const map = new window.kakao.maps.Map(mapRef.current, {
+          center,
+          level: 5,
+        });
+        mapInstanceRef.current = map;
+
+        // User location marker
+        const dot = document.createElement("div");
+        dot.style.cssText = "width:16px;height:16px;background:#3b82f6;border-radius:50%;border:3px solid white;box-shadow:0 0 0 6px rgba(59,130,246,0.2), 0 0 12px rgba(59,130,246,0.4);";
+        new window.kakao.maps.CustomOverlay({
+          position: center,
+          content: dot,
+          yAnchor: 0.5,
+          map,
+        });
+
+        updateMarkers(map, window.kakao, sorted);
+      });
+    };
+
+    if (window.kakao?.maps) {
+      initMap();
+    } else {
+      const t = setInterval(() => {
+        if (window.kakao?.maps) { clearInterval(t); initMap(); }
+      }, 300);
+      return () => clearInterval(t);
+    }
+  }, []);
+
+  // Update markers when sorted changes
+  useEffect(() => {
+    if (!mapInstanceRef.current || !window.kakao?.maps) return;
+    updateMarkers(mapInstanceRef.current, window.kakao, sorted);
+  }, [sorted, updateMarkers]);
+
   return (
     <div className="relative h-[calc(100vh-56px)] overflow-hidden">
-      {/* ====== 지도 영역 ====== */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-blue-50 to-slate-100">
-        {/* 카카오맵 자리 */}
-        <div id="kakao-map" className="w-full h-full" />
+      {/* Map */}
+      <div className="absolute inset-0">
+        <div ref={mapRef} id="kakao-map" className="w-full h-full" />
 
-        {/* 지도 오버레이: 목업 마커들 */}
-        <MapMarkers libraries={sorted} />
-
-        {/* 지도 오버레이: 반경 필터 */}
-        <div className="absolute top-6 left-4 flex gap-2 z-10 animate-fade-in">
+        {/* Radius filter */}
+        <div className="absolute top-4 left-4 flex gap-2 z-10 animate-fade-in">
           {[1, 3, 5, 10].map((r, idx) => (
             <button
               key={r}
@@ -46,48 +143,67 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* 내 위치 버튼 */}
-        <button className="absolute top-6 right-4 w-12 h-12 bg-white/90 backdrop-blur-md rounded-full shadow-lg shadow-blue-500/20 flex items-center justify-center z-10 hover:bg-white transition-all transform hover:scale-110 hover:shadow-xl hover:shadow-blue-500/40 animate-float">
+        {/* My location button */}
+        <button
+          className="absolute top-4 right-4 w-12 h-12 bg-white/90 backdrop-blur-md rounded-full shadow-lg shadow-blue-500/20 flex items-center justify-center z-10 hover:bg-white transition-all transform hover:scale-110"
+          onClick={() => {
+            if (mapInstanceRef.current && window.kakao) {
+              mapInstanceRef.current.setCenter(new window.kakao.maps.LatLng(37.5665, 126.978));
+              mapInstanceRef.current.setLevel(5);
+            }
+          }}
+        >
           <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06z" />
           </svg>
         </button>
       </div>
 
-      {/* ====== 바텀 시트 ====== */}
+      {/* Bottom Sheet */}
       <div
         className={cn(
-          "bottom-sheet",
-          sheetOpen ? "translate-y-0" : "translate-y-[70%]"
+          "bottom-sheet transition-transform duration-500 ease-out",
+          sheetOpen ? "translate-y-0" : "translate-y-[calc(100%-80px)]"
         )}
         style={{ height: "70vh" }}
       >
-        {/* 핸들 */}
+        {/* Handle */}
         <div
-          className="cursor-grab active:cursor-grabbing py-3 hover:scale-110 transition"
+          className="cursor-grab active:cursor-grabbing pt-3 pb-2 hover:bg-slate-50/50 transition rounded-t-3xl"
           onClick={() => setSheetOpen(!sheetOpen)}
         >
           <div className="bottom-sheet-handle" />
+          {!sheetOpen && (
+            <div className="px-6 mt-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-base font-bold text-slate-800">{"\ud83d\udccd"} 내 주변 도서관</span>
+                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">{sorted.length}개</span>
+              </div>
+              <span className="text-xs text-slate-400">{"\u2191"} 위로 밀어 열기</span>
+            </div>
+          )}
         </div>
 
-        {/* 헤더 */}
-        <div className="px-6 pb-4 flex items-center justify-between border-b border-slate-200/50">
-          <div className="flex items-center gap-3">
-            <span className="text-xl font-bold gradient-text">📍 내 주변 도서관</span>
-            <span className="px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">{sorted.length}개</span>
+        {/* Header when open */}
+        {sheetOpen && (
+          <div className="px-6 pb-4 flex items-center justify-between border-b border-slate-200/50 animate-fade-in">
+            <div className="flex items-center gap-3">
+              <span className="text-xl font-bold gradient-text">{"\ud83d\udccd"} 내 주변 도서관</span>
+              <span className="px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">{sorted.length}개</span>
+            </div>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as "distance" | "seats")}
+              className="text-sm font-medium text-slate-700 glass rounded-lg px-3 py-1.5 border-0 focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="distance">거리순</option>
+              <option value="seats">잔여좌석순</option>
+            </select>
           </div>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as "distance" | "seats")}
-            className="text-sm font-medium text-slate-700 glass rounded-lg px-3 py-1.5 border-0 focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="distance">거리순</option>
-            <option value="seats">잔여좌석순</option>
-          </select>
-        </div>
+        )}
 
-        {/* 도서관 목록 */}
-        <div className="overflow-y-auto h-[calc(70vh-120px)] px-4 py-3 space-y-3 scrollbar-thin">
+        {/* Library list */}
+        <div className={cn("overflow-y-auto px-4 py-3 space-y-3 scrollbar-thin", sheetOpen ? "h-[calc(70vh-120px)]" : "h-0 overflow-hidden")}>
           {sorted.map((lib, idx) => (
             <div key={lib.id} style={{ animationDelay: `${idx * 50}ms` }} className="animate-slide-up">
               <LibraryCard library={lib} />
@@ -96,18 +212,17 @@ export default function HomePage() {
 
           {sorted.length === 0 && (
             <div className="text-center py-12 text-slate-400">
-              <p className="text-5xl mb-3 animate-float">🔍</p>
+              <p className="text-5xl mb-3 animate-float">{"\ud83d\udd0d"}</p>
               <p className="font-bold text-slate-600">반경 {radius}km 내 도서관이 없습니다</p>
               <p className="text-sm mt-2 text-slate-500">검색 반경을 넓혀보세요</p>
             </div>
           )}
 
-          {/* AI 추천 버튼 */}
           <a
             href="/recommend"
             className="block w-full py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white text-center font-bold rounded-2xl hover:shadow-2xl hover:shadow-blue-600/40 transition-all transform hover:scale-105 mt-4 text-lg"
           >
-            🤖 AI 최적 도서관 추천받기
+            {"\ud83e\udd16"} AI 최적 도서관 추천받기
           </a>
         </div>
       </div>
@@ -115,8 +230,6 @@ export default function HomePage() {
   );
 }
 
-// ============================
-// 도서관 카드 컴포넌트
 // ============================
 function LibraryCard({ library }: { library: LibraryWithDistance }) {
   const color = getCongestionColor(library.congestionLevel);
@@ -127,10 +240,7 @@ function LibraryCard({ library }: { library: LibraryWithDistance }) {
       className="block glass rounded-2xl hover:shadow-xl hover:scale-[1.02] transition-all duration-300 p-4"
     >
       <div className="flex gap-3">
-        {/* 혼잡도 인디케이터 */}
         <div className={cn("w-2 rounded-full shrink-0 shadow-md", color.bg)} />
-
-        {/* 본문 */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div>
@@ -145,7 +255,6 @@ function LibraryCard({ library }: { library: LibraryWithDistance }) {
             </div>
           </div>
 
-          {/* 열람실 현황 */}
           <div className="mt-3 space-y-2">
             {library.rooms.map((room) => {
               const roomColor = getCongestionColor(room.congestionLevel);
@@ -166,17 +275,15 @@ function LibraryCard({ library }: { library: LibraryWithDistance }) {
             })}
           </div>
 
-          {/* 태그 */}
           <div className="flex flex-wrap gap-1.5 mt-3">
-            {library.nightOperation && <Tag>🌙 야간</Tag>}
-            {library.accessible && <Tag>♿ 접근</Tag>}
-            {library.reservable && <Tag>📝 예약</Tag>}
-            {library.wifi && <Tag>📶 와이파이</Tag>}
+            {library.nightOperation && <Tag>{"\ud83c\udf19"} 야간</Tag>}
+            {library.accessible && <Tag>{"\u267f"} 접근</Tag>}
+            {library.reservable && <Tag>{"\ud83d\udcdd"} 예약</Tag>}
+            {library.wifi && <Tag>{"\ud83d\udcf6"} 와이파이</Tag>}
           </div>
         </div>
 
-        {/* 화살표 */}
-        <svg className="w-5 h-5 text-slate-300 shrink-0 mt-1 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 text-slate-300 shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </div>
@@ -189,61 +296,5 @@ function Tag({ children }: { children: React.ReactNode }) {
     <span className="px-2.5 py-0.5 bg-slate-200/60 text-slate-700 text-[10px] font-bold rounded-full">
       {children}
     </span>
-  );
-}
-
-// ============================
-// 지도 마커 (목업)
-// ============================
-function MapMarkers({ libraries }: { libraries: LibraryWithDistance[] }) {
-  const positions = [
-    { top: "30%", left: "40%" },
-    { top: "55%", left: "65%" },
-    { top: "25%", left: "20%" },
-    { top: "45%", left: "50%" },
-    { top: "60%", left: "30%" },
-    { top: "35%", left: "75%" },
-  ];
-
-  const colorMap: Record<CongestionLevel, string> = {
-    "여유": "bg-emerald-500 shadow-lg shadow-emerald-500/50",
-    "보통": "bg-amber-500 shadow-lg shadow-amber-500/50",
-    "혼잡": "bg-red-500 shadow-lg shadow-red-500/50",
-  };
-
-  return (
-    <>
-      {/* 사용자 위치 마커 */}
-      <div
-        className="absolute z-10 animate-pulse-glow"
-        style={{ top: "42%", left: "48%" }}
-      >
-        <div className="relative w-5 h-5">
-          <div className="w-5 h-5 bg-blue-600 rounded-full border-3 border-white shadow-lg shadow-blue-500/50 animate-pulse-glow" />
-        </div>
-      </div>
-
-      {/* 도서관 마커들 */}
-      {libraries.slice(0, 6).map((lib, i) => (
-        <a
-          key={lib.id}
-          href={`/library/${lib.id}`}
-          className="absolute z-10 marker-bounce"
-          style={positions[i] || { top: "50%", left: "50%" }}
-        >
-          <div className="flex flex-col items-center">
-            <div
-              className={cn(
-                "w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-xl border-3 border-white transition-all hover:scale-110",
-                colorMap[lib.congestionLevel]
-              )}
-            >
-              {lib.totalAvailable}
-            </div>
-            <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[10px] border-transparent border-t-white -mt-0.5" />
-          </div>
-        </a>
-      ))}
-    </>
   );
 }
