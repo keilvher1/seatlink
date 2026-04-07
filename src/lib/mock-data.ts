@@ -1,0 +1,362 @@
+import {
+  Library,
+  LibraryWithDistance,
+  PredictionData,
+  WeeklyHeatmapData,
+  BikeStation,
+  BusInfo,
+  AccessibleTransport,
+  DashboardKPI,
+  RegionUsage,
+  HourlyTrend,
+  Review,
+  StudyGroup,
+} from "./types";
+
+// ========================
+// 도서관 목업 데이터
+// ========================
+export const mockLibraries: LibraryWithDistance[] = [
+  {
+    id: "lib-001",
+    name: "서울중앙도서관",
+    address: "서울시 중구 세종대로 110",
+    lat: 37.5636,
+    lng: 126.975,
+    phone: "02-2133-0300",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "09:00~17:00" },
+    nightOperation: true,
+    accessible: true,
+    reservable: true,
+    wifi: true,
+    parking: true,
+    todayVisitors: 482,
+    seatUsageRate: 60,
+    congestionLevel: "보통",
+    rooms: [
+      { name: "일반열람실", totalSeats: 80, usedSeats: 48, availableSeats: 32, congestionLevel: "보통", congestionPercent: 60, lastUpdated: "2분 전" },
+      { name: "노트북열람실", totalSeats: 60, usedSeats: 18, availableSeats: 42, congestionLevel: "여유", congestionPercent: 30, lastUpdated: "2분 전" },
+      { name: "수험생열람실", totalSeats: 100, usedSeats: 88, availableSeats: 12, congestionLevel: "혼잡", congestionPercent: 88, lastUpdated: "1분 전" },
+    ],
+    totalSeats: 240,
+    totalUsed: 154,
+    totalAvailable: 86,
+    distance: 1.2,
+    distanceText: "도보 15분",
+    travelMinutes: 15,
+  },
+  {
+    id: "lib-002",
+    name: "강남구립도서관",
+    address: "서울시 강남구 선릉로 668",
+    lat: 37.5045,
+    lng: 127.049,
+    phone: "02-3448-4646",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "휴관" },
+    nightOperation: true,
+    accessible: true,
+    reservable: false,
+    wifi: true,
+    parking: false,
+    todayVisitors: 325,
+    seatUsageRate: 78,
+    congestionLevel: "혼잡",
+    rooms: [
+      { name: "제1열람실", totalSeats: 60, usedSeats: 52, availableSeats: 8, congestionLevel: "혼잡", congestionPercent: 87, lastUpdated: "3분 전" },
+      { name: "제2열람실", totalSeats: 40, usedSeats: 38, availableSeats: 2, congestionLevel: "혼잡", congestionPercent: 95, lastUpdated: "1분 전" },
+    ],
+    totalSeats: 100,
+    totalUsed: 90,
+    totalAvailable: 10,
+    distance: 3.8,
+    distanceText: "버스 20분",
+    travelMinutes: 20,
+  },
+  {
+    id: "lib-003",
+    name: "마포중앙도서관",
+    address: "서울시 마포구 성암로 137",
+    lat: 37.5665,
+    lng: 126.899,
+    phone: "02-3153-5800",
+    operatingHours: { weekday: "09:00~18:00", saturday: "09:00~18:00", holiday: "휴관" },
+    nightOperation: false,
+    accessible: true,
+    reservable: true,
+    wifi: true,
+    parking: true,
+    todayVisitors: 198,
+    seatUsageRate: 25,
+    congestionLevel: "여유",
+    rooms: [
+      { name: "종합열람실", totalSeats: 120, usedSeats: 30, availableSeats: 90, congestionLevel: "여유", congestionPercent: 25, lastUpdated: "1분 전" },
+    ],
+    totalSeats: 120,
+    totalUsed: 30,
+    totalAvailable: 90,
+    distance: 0.8,
+    distanceText: "🚲 5분",
+    travelMinutes: 5,
+  },
+  {
+    id: "lib-004",
+    name: "용산도서관",
+    address: "서울시 용산구 녹사평대로 150",
+    lat: 37.5326,
+    lng: 126.986,
+    phone: "02-6906-9100",
+    operatingHours: { weekday: "09:00~18:00", saturday: "09:00~17:00", holiday: "휴관" },
+    nightOperation: false,
+    accessible: false,
+    reservable: false,
+    wifi: true,
+    parking: false,
+    todayVisitors: 87,
+    seatUsageRate: 92,
+    congestionLevel: "혼잡",
+    rooms: [
+      { name: "열람실", totalSeats: 40, usedSeats: 37, availableSeats: 3, congestionLevel: "혼잡", congestionPercent: 92, lastUpdated: "5분 전" },
+    ],
+    totalSeats: 40,
+    totalUsed: 37,
+    totalAvailable: 3,
+    distance: 2.5,
+    distanceText: "도보 30분",
+    travelMinutes: 30,
+  },
+  {
+    id: "lib-005",
+    name: "영등포구립도서관",
+    address: "서울시 영등포구 당산로 123",
+    lat: 37.5264,
+    lng: 126.8965,
+    phone: "02-2165-9100",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "09:00~17:00" },
+    nightOperation: true,
+    accessible: true,
+    reservable: true,
+    wifi: true,
+    parking: true,
+    todayVisitors: 256,
+    seatUsageRate: 55,
+    congestionLevel: "보통",
+    rooms: [
+      { name: "디지털열람실", totalSeats: 50, usedSeats: 22, availableSeats: 28, congestionLevel: "여유", congestionPercent: 44, lastUpdated: "2분 전" },
+      { name: "수험생열람실", totalSeats: 80, usedSeats: 66, availableSeats: 14, congestionLevel: "혼잡", congestionPercent: 82, lastUpdated: "1분 전" },
+    ],
+    totalSeats: 130,
+    totalUsed: 88,
+    totalAvailable: 42,
+    distance: 4.2,
+    distanceText: "버스 18분",
+    travelMinutes: 18,
+  },
+  {
+    id: "lib-006",
+    name: "송파구립도서관",
+    address: "서울시 송파구 올림픽로 326",
+    lat: 37.5145,
+    lng: 127.1055,
+    phone: "02-2147-2200",
+    operatingHours: { weekday: "09:00~21:00", saturday: "09:00~17:00", holiday: "휴관" },
+    nightOperation: true,
+    accessible: true,
+    reservable: true,
+    wifi: true,
+    parking: true,
+    todayVisitors: 312,
+    seatUsageRate: 38,
+    congestionLevel: "여유",
+    rooms: [
+      { name: "일반열람실", totalSeats: 100, usedSeats: 35, availableSeats: 65, congestionLevel: "여유", congestionPercent: 35, lastUpdated: "1분 전" },
+      { name: "노트북존", totalSeats: 40, usedSeats: 18, availableSeats: 22, congestionLevel: "여유", congestionPercent: 45, lastUpdated: "3분 전" },
+    ],
+    totalSeats: 140,
+    totalUsed: 53,
+    totalAvailable: 87,
+    distance: 5.1,
+    distanceText: "버스 25분",
+    travelMinutes: 25,
+  },
+];
+
+// ========================
+// AI 예측 목업 데이터
+// ========================
+export const mockPrediction: PredictionData[] = [
+  { hour: "06:00", congestion: 8, isPast: true },
+  { hour: "07:00", congestion: 12, isPast: true },
+  { hour: "08:00", congestion: 28, isPast: true },
+  { hour: "09:00", congestion: 48, isPast: true },
+  { hour: "10:00", congestion: 68, isPast: true },
+  { hour: "11:00", congestion: 82, isPast: true },
+  { hour: "12:00", congestion: 62, isPast: true },
+  { hour: "13:00", congestion: 55, isPast: false },
+  { hour: "14:00", congestion: 42, isPast: false },
+  { hour: "15:00", congestion: 48, isPast: false },
+  { hour: "16:00", congestion: 63, isPast: false },
+  { hour: "17:00", congestion: 75, isPast: false },
+  { hour: "18:00", congestion: 88, isPast: false },
+  { hour: "19:00", congestion: 92, isPast: false },
+  { hour: "20:00", congestion: 78, isPast: false },
+  { hour: "21:00", congestion: 50, isPast: false },
+  { hour: "22:00", congestion: 20, isPast: false },
+];
+
+export const mockWeeklyHeatmap: WeeklyHeatmapData[] = [
+  { day: "월", hours: [5,10,25,50,70,85,65,45,35,42,60,78,88,80,55,30,10] },
+  { day: "화", hours: [5,12,30,55,72,80,60,42,38,45,62,75,85,78,52,28,8] },
+  { day: "수", hours: [8,15,32,58,75,82,58,40,35,48,65,80,90,82,58,32,12] },
+  { day: "목", hours: [6,10,28,52,68,78,55,38,32,40,58,72,82,75,50,25,8] },
+  { day: "금", hours: [5,8,22,45,62,72,50,35,30,38,55,68,78,70,45,22,5] },
+  { day: "토", hours: [3,5,10,20,35,50,60,65,70,68,62,55,48,40,30,18,5] },
+  { day: "일", hours: [2,3,8,15,25,35,42,48,52,50,45,40,35,28,20,12,3] },
+];
+
+// ========================
+// 교통 목업 데이터
+// ========================
+export const mockBikeStations: BikeStation[] = [
+  { id: "bike-001", name: "세종대로사거리 대여소", lat: 37.564, lng: 126.976, availableBikes: 5, totalDocks: 15, distance: 0.05 },
+  { id: "bike-002", name: "시청역 2번출구 대여소", lat: 37.565, lng: 126.977, availableBikes: 8, totalDocks: 20, distance: 0.12 },
+];
+
+export const mockBuses: BusInfo[] = [
+  { routeNumber: "302", arrivalMinutes: 3, stopName: "세종대로사거리", stopDistance: 0.2 },
+  { routeNumber: "501", arrivalMinutes: 8, stopName: "세종대로사거리", stopDistance: 0.2 },
+  { routeNumber: "707", arrivalMinutes: 15, stopName: "서울역", stopDistance: 0.5 },
+];
+
+export const mockAccessibleTransport: AccessibleTransport = {
+  centerName: "중구 교통약자이동지원센터",
+  availableVehicles: 2,
+  totalVehicles: 8,
+  estimatedWait: 15,
+};
+
+// ========================
+// 대시보드 목업 데이터
+// ========================
+export const mockDashboardKPI: DashboardKPI = {
+  totalLibraries: 3247,
+  currentUsers: 45832,
+  averageUsageRate: 67.3,
+  totalAvailableSeats: 52168,
+  totalSeats: 158000,
+};
+
+export const mockRegionUsage: RegionUsage[] = [
+  { region: "서울", usageRate: 78 },
+  { region: "경기", usageRate: 72 },
+  { region: "부산", usageRate: 68 },
+  { region: "대구", usageRate: 65 },
+  { region: "인천", usageRate: 63 },
+  { region: "광주", usageRate: 60 },
+  { region: "대전", usageRate: 58 },
+  { region: "울산", usageRate: 55 },
+  { region: "세종", usageRate: 52 },
+  { region: "경남", usageRate: 50 },
+  { region: "충남", usageRate: 48 },
+  { region: "전남", usageRate: 45 },
+  { region: "경북", usageRate: 43 },
+  { region: "충북", usageRate: 42 },
+  { region: "전북", usageRate: 40 },
+  { region: "강원", usageRate: 38 },
+  { region: "제주", usageRate: 35 },
+];
+
+export const mockHourlyTrend: HourlyTrend[] = [
+  { hour: "06:00", today: 8, lastWeek: 6 },
+  { hour: "07:00", today: 15, lastWeek: 12 },
+  { hour: "08:00", today: 32, lastWeek: 28 },
+  { hour: "09:00", today: 55, lastWeek: 50 },
+  { hour: "10:00", today: 72, lastWeek: 68 },
+  { hour: "11:00", today: 85, lastWeek: 80 },
+  { hour: "12:00", today: 65, lastWeek: 62 },
+  { hour: "13:00", today: 58, lastWeek: 55 },
+  { hour: "14:00", today: 45, lastWeek: 48 },
+  { hour: "15:00", today: 52, lastWeek: 50 },
+  { hour: "16:00", today: 68, lastWeek: 65 },
+  { hour: "17:00", today: 78, lastWeek: 72 },
+  { hour: "18:00", today: 88, lastWeek: 82 },
+  { hour: "19:00", today: 92, lastWeek: 85 },
+  { hour: "20:00", today: 80, lastWeek: 75 },
+  { hour: "21:00", today: 55, lastWeek: 50 },
+  { hour: "22:00", today: 22, lastWeek: 18 },
+];
+
+// ========================
+// 커뮤니티 목업 데이터
+// ========================
+export const mockReviews: Review[] = [
+  {
+    id: "r1", userId: "u1", userName: "김*수",
+    libraryId: "lib-001", libraryName: "서울중앙도서관", roomName: "일반열람실",
+    mood: "🤫 조용해요",
+    content: "3층 열람실 지금 조용하고 자리도 넉넉해요. 콘센트 자리는 거의 찼지만 일반 자리는 여유 있습니다 👍",
+    helpful: 23, comments: 3, createdAt: "15분 전",
+  },
+  {
+    id: "r2", userId: "u2", userName: "이*연",
+    libraryId: "lib-003", libraryName: "마포중앙도서관", roomName: "종합열람실",
+    mood: "💪 집중 잘 돼요",
+    content: "오늘 여기 분위기 최고입니다. 사람도 적고 에어컨도 적절해요. 오래 앉아있기 좋아요.",
+    helpful: 15, comments: 1, createdAt: "32분 전",
+  },
+  {
+    id: "r3", userId: "u3", userName: "박*호",
+    libraryId: "lib-002", libraryName: "강남구립도서관",
+    mood: "😰 복잡해요",
+    content: "2층 열람실 거의 만석이에요. 자리 잡으려면 일찍 오셔야 합니다. 1층은 그나마 괜찮아요.",
+    helpful: 31, comments: 5, createdAt: "1시간 전",
+  },
+  {
+    id: "r4", userId: "u4", userName: "최*진",
+    libraryId: "lib-005", libraryName: "영등포구립도서관", roomName: "디지털열람실",
+    mood: "😊 좋아요",
+    content: "디지털열람실 리모델링하고 나서 정말 좋아졌어요! 모니터도 크고 의자도 편해요.",
+    helpful: 42, comments: 7, createdAt: "2시간 전",
+  },
+  {
+    id: "r5", userId: "u5", userName: "정*현",
+    libraryId: "lib-006", libraryName: "송파구립도서관", roomName: "노트북존",
+    mood: "😊 좋아요",
+    content: "노트북존 자리 넉넉하고 콘센트 충분합니다. 와이파이도 빨라요. 단 커피 반입 안돼요.",
+    helpful: 18, comments: 2, createdAt: "3시간 전",
+  },
+];
+
+export const mockStudyGroups: StudyGroup[] = [
+  {
+    id: "sg1", title: "공무원 시험 스터디",
+    libraryName: "서울중앙도서관", location: "3층 열람실",
+    currentMembers: 4, maxMembers: 6,
+    schedule: "매주 월·수·금", time: "09:00~13:00",
+    description: "행정법, 헌법 같이 공부하실 분 모집합니다. 서로 질문하고 모의고사 함께 풀어요!",
+    tags: ["공무원", "행정법", "헌법"],
+  },
+  {
+    id: "sg2", title: "수능 수학 스터디",
+    libraryName: "마포중앙도서관", location: "종합열람실",
+    currentMembers: 3, maxMembers: 5,
+    schedule: "매일", time: "14:00~18:00",
+    description: "수능 수학 기출 풀이 스터디입니다. 킬러문항 함께 도전해요.",
+    tags: ["수능", "수학", "기출"],
+  },
+  {
+    id: "sg3", title: "토익 900+ 목표반",
+    libraryName: "강남구립도서관", location: "제1열람실",
+    currentMembers: 5, maxMembers: 8,
+    schedule: "매주 화·목·토", time: "10:00~12:00",
+    description: "토익 900점 이상 목표! LC/RC 파트별로 번갈아 스터디합니다.",
+    tags: ["토익", "영어", "TOEIC"],
+  },
+  {
+    id: "sg4", title: "📖 인문학 독서 모임",
+    libraryName: "송파구립도서관", location: "자유열람실",
+    currentMembers: 6, maxMembers: 10,
+    schedule: "격주 일요일", time: "14:00~16:00",
+    description: "한 달에 2권 인문학 책을 읽고 토론합니다. 편하게 오세요!",
+    tags: ["독서", "인문학", "토론"],
+  },
+];
