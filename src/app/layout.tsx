@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import AuthProvider from "@/components/AuthProvider";
 
 export const metadata: Metadata = {
   title: "좌석이음 SeatLink — 전국 도서관 실시간 좌석 · AI 추천",
@@ -18,14 +19,16 @@ export default function RootLayout({
 
       </head>
       <body className="bg-slate-50 text-slate-900 antialiased">
-        {/* 헤더 */}
-        <Header />
+        <AuthProvider>
+          {/* 헤더 */}
+          <Header />
 
-        {/* 메인 콘텐츠 */}
-        <main className="pb-20 md:pb-0">{children}</main>
+          {/* 메인 콘텐츠 */}
+          <main className="pb-20 md:pb-0">{children}</main>
 
-        {/* 모바일 하단 네비게이션 */}
-        <BottomNav />
+          {/* 모바일 하단 네비게이션 */}
+          <BottomNav />
+        </AuthProvider>
       </body>
     </html>
   );
@@ -69,9 +72,9 @@ function Header() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
             </svg>
           </button>
-          <button className="hidden md:block px-4 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full hover:shadow-lg hover:shadow-blue-500/30 transition transform hover:scale-105">
+          <a href="/login" className="hidden md:block px-4 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full hover:shadow-lg hover:shadow-blue-500/30 transition transform hover:scale-105">
             로그인
-          </button>
+          </a>
         </div>
       </div>
     </header>
