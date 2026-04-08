@@ -1,4 +1,3 @@
-import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
 import { mockLibraries } from "@/lib/mock-data";
 
@@ -59,7 +58,7 @@ export async function POST(req: Request) {
 - \uC6B4\uC601\uC2DC\uAC04\`;
 
   const result = streamText({
-    model: openai("gpt-4o-mini"),
+    model: "openai/gpt-4o-mini",
     system: systemPrompt,
     messages,
   });
