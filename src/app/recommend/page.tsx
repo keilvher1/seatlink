@@ -89,9 +89,9 @@ export default function RecommendPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 pb-24 md:pb-8">
-      <div className="text-center mb-6 animate-slide-up">
-        <h1 className="text-3xl font-bold gradient-text mb-2">{"\uD83E\uDD16 AI \uB3C4\uC11C\uAD00 \uCD94\uCC9C"}</h1>
-        <p className="text-slate-500">{"AI\uAC00 \uC2E4\uC2DC\uAC04 \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD558\uC5EC \uCD5C\uC801\uC758 \uB3C4\uC11C\uAD00\uC744 \uCD94\uCC9C\uD569\uB2C8\uB2E4"}</p>
+      <div className="text-center mb-4 sm:mb-6 animate-slide-up">
+        <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-1 sm:mb-2">{"\uD83E\uDD16 AI \uB3C4\uC11C\uAD00 \uCD94\uCC9C"}</h1>
+        <p className="text-xs sm:text-base text-slate-500">{"AI\uAC00 \uC2E4\uC2DC\uAC04 \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD558\uC5EC \uCD5C\uC801\uC758 \uB3C4\uC11C\uAD00\uC744 \uCD94\uCC9C\uD569\uB2C8\uB2E4"}</p>
       </div>
       <div className="flex gap-2 mb-6 justify-center">
         <button onClick={() => setActiveTab("ai")} className={cn("px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300", activeTab === "ai" ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-200" : "glass text-slate-600 hover:text-slate-900")}>
@@ -104,7 +104,7 @@ export default function RecommendPage() {
       {activeTab === "ai" && (
         <div className="animate-slide-up">
           <div className="glass rounded-2xl overflow-hidden mb-4">
-            <div className="h-[450px] overflow-y-auto p-4 space-y-4">
+            <div className="h-[350px] sm:h-[450px] overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
               {messages.length === 0 && (
                 <div className="text-center py-8">
                   <div className="text-5xl mb-4">{"\uD83E\uDD16"}</div>
@@ -137,8 +137,8 @@ export default function RecommendPage() {
             </div>
             <div className="border-t border-slate-200/60 p-3">
               <div className="flex gap-2">
-                <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()} placeholder={"\uC5B4\uB5A4 \uB3C4\uC11C\uAD00\uC744 \uCC3E\uACE0 \uACC4\uC2E0\uAC00\uC694?"} className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-sm border border-slate-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all" disabled={isAiLoading} />
-                <button id="send-btn" onClick={sendMessage} disabled={isAiLoading || !input.trim()} className="px-5 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl text-sm font-bold hover:shadow-lg hover:shadow-violet-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed">{isAiLoading ? "..." : "\uC804\uC1A1"}</button>
+                <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()} placeholder={"\uC5B4\uB5A4 \uB3C4\uC11C\uAD00\uC744 \uCC3E\uACE0 \uACC4\uC2E0\uAC00\uC694?"} className="flex-1 min-w-0 px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 rounded-xl text-sm border border-slate-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all" disabled={isAiLoading} />
+                <button id="send-btn" onClick={sendMessage} disabled={isAiLoading || !input.trim()} className="px-3 sm:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl text-sm font-bold hover:shadow-lg hover:shadow-violet-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0">{isAiLoading ? "..." : "\uC804\uC1A1"}</button>
               </div>
               <p className="text-[10px] text-slate-400 mt-2 text-center">{"AI\uAC00 " + mockLibraries.length + "\uAC1C \uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uC88C\uC11D \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD569\uB2C8\uB2E4 \u2022 Powered by OpenAI"}</p>
             </div>
@@ -181,7 +181,7 @@ function RecommendCard({ library, rank, delay }: { library: LibraryWithDistance 
     <div style={{ animationDelay: `${delay}ms` }} className="animate-slide-up">
       <a href={`/library/${library.id}`} className="glass rounded-2xl p-6 hover:shadow-xl hover:scale-[1.01] transition-all duration-300 block">
         <div className="flex items-start gap-4">
-          <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${scoreBg} text-white flex items-center justify-center flex-shrink-0 shadow-lg text-lg font-bold`}>#{rank}</div>
+          <div className={`w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br ${scoreBg} text-white flex items-center justify-center flex-shrink-0 shadow-lg text-sm sm:text-lg font-bold`}>#{rank}</div>
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-3 mb-2">
               <div>
