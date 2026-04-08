@@ -33,6 +33,7 @@ export default function RecommendPage() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
   const sendMessage = async () => {
     if (!input.trim() || isAiLoading) return;
     const userMessage: ChatMessage = { role: "user", content: input.trim() };
@@ -56,7 +57,7 @@ export default function RecommendPage() {
           const { done, value } = await reader.read();
           if (done) break;
           const chunk = decoder.decode(value);
-          const lines = chunk.split("\\n");
+          const lines = chunk.split("\n");
           for (const line of lines) {
             if (line.startsWith("0:")) {
               try {
@@ -78,6 +79,7 @@ export default function RecommendPage() {
       setIsAiLoading(false);
     }
   };
+
   const quickQuestions = [
     "\uC9C0\uAE08 \uAC00\uC7A5 \uC5EC\uC720\uB85C\uC6B4 \uB3C4\uC11C\uAD00 \uCD94\uCC9C\uD574\uC918",
     "\uC57C\uAC04\uC5D0 \uC6B4\uC601\uD558\uB294 \uB3C4\uC11C\uAD00 \uC54C\uB824\uC918",
@@ -88,15 +90,15 @@ export default function RecommendPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 pb-24 md:pb-8">
       <div className="text-center mb-6 animate-slide-up">
-        <h1 className="text-3xl font-bold gradient-text mb-2">\uD83E\uDD16 AI \uB3C4\uC11C\uAD00 \uCD94\uCC9C</h1>
-        <p className="text-slate-500">AI\uAC00 \uC2E4\uC2DC\uAC04 \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD558\uC5EC \uCD5C\uC801\uC758 \uB3C4\uC11C\uAD00\uC744 \uCD94\uCC9C\uD569\uB2C8\uB2E4</p>
+        <h1 className="text-3xl font-bold gradient-text mb-2">{"\uD83E\uDD16 AI \uB3C4\uC11C\uAD00 \uCD94\uCC9C"}</h1>
+        <p className="text-slate-500">{"AI\uAC00 \uC2E4\uC2DC\uAC04 \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD558\uC5EC \uCD5C\uC801\uC758 \uB3C4\uC11C\uAD00\uC744 \uCD94\uCC9C\uD569\uB2C8\uB2E4"}</p>
       </div>
       <div className="flex gap-2 mb-6 justify-center">
         <button onClick={() => setActiveTab("ai")} className={cn("px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300", activeTab === "ai" ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-200" : "glass text-slate-600 hover:text-slate-900")}>
-          \u2728 AI \uCD94\uCC9C
+          {"\u2728 AI \uCD94\uCC9C"}
         </button>
         <button onClick={() => setActiveTab("list")} className={cn("px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300", activeTab === "list" ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-200" : "glass text-slate-600 hover:text-slate-900")}>
-          \uD83D\uDCCB \uCD94\uCC9C \uBAA9\uB85D
+          {"\uD83D\uDCCB \uCD94\uCC9C \uBAA9\uB85D"}
         </button>
       </div>
       {activeTab === "ai" && (
@@ -105,9 +107,9 @@ export default function RecommendPage() {
             <div className="h-[450px] overflow-y-auto p-4 space-y-4">
               {messages.length === 0 && (
                 <div className="text-center py-8">
-                  <div className="text-5xl mb-4">\uD83E\uDD16</div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">AI \uB3C4\uC11C\uAD00 \uCD94\uCC9C \uC5B4\uC2DC\uC2A4\uD134\uD2B8</h3>
-                  <p className="text-sm text-slate-500 mb-6">\uC804\uAD6D {mockLibraries.length}\uAC1C \uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD558\uC5EC<br />\uCD5C\uC801\uC758 \uB3C4\uC11C\uAD00\uC744 \uCD94\uCC9C\uD574\uB4DC\uB9BD\uB2C8\uB2E4.</p>
+                  <div className="text-5xl mb-4">{"\uD83E\uDD16"}</div>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">{"AI \uB3C4\uC11C\uAD00 \uCD94\uCC9C \uC5B4\uC2DC\uC2A4\uD134\uD2B8"}</h3>
+                  <p className="text-sm text-slate-500 mb-6">{"\uC804\uAD6D " + mockLibraries.length + "\uAC1C \uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD558\uC5EC"}<br />{"\uCD5C\uC801\uC758 \uB3C4\uC11C\uAD00\uC744 \uCD94\uCC9C\uD574\uB4DC\uB9BD\uB2C8\uB2E4."}</p>
                   <div className="flex flex-wrap gap-2 justify-center max-w-md mx-auto">
                     {quickQuestions.map((q) => (
                       <button key={q} onClick={() => { setInput(q); setTimeout(() => { const btn = document.getElementById("send-btn"); if (btn) btn.click(); }, 100); }} className="px-3 py-2 bg-violet-50 hover:bg-violet-100 text-violet-700 text-xs font-medium rounded-full transition-colors">{q}</button>
@@ -128,17 +130,17 @@ export default function RecommendPage() {
                       </span>
                     )}
                   </div>
-                  {msg.role === "user" && (<div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center flex-shrink-0 text-white text-sm shadow-md">\uB098</div>)}
+                  {msg.role === "user" && (<div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center flex-shrink-0 text-white text-sm shadow-md">{"\uB098"}</div>)}
                 </div>
               ))}
               <div ref={chatEndRef} />
             </div>
             <div className="border-t border-slate-200/60 p-3">
               <div className="flex gap-2">
-                <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()} placeholder="\uC5B4\uB5A4 \uB3C4\uC11C\uAD00\uC744 \uCC3E\uACE0 \uACC4\uC2E0\uAC00\uC694?" className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-sm border border-slate-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all" disabled={isAiLoading} />
+                <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()} placeholder={"\uC5B4\uB5A4 \uB3C4\uC11C\uAD00\uC744 \uCC3E\uACE0 \uACC4\uC2E0\uAC00\uC694?"} className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-sm border border-slate-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none transition-all" disabled={isAiLoading} />
                 <button id="send-btn" onClick={sendMessage} disabled={isAiLoading || !input.trim()} className="px-5 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl text-sm font-bold hover:shadow-lg hover:shadow-violet-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed">{isAiLoading ? "..." : "\uC804\uC1A1"}</button>
               </div>
-              <p className="text-[10px] text-slate-400 mt-2 text-center">AI\uAC00 {mockLibraries.length}\uAC1C \uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uC88C\uC11D \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD569\uB2C8\uB2E4 \u2022 Powered by OpenAI</p>
+              <p className="text-[10px] text-slate-400 mt-2 text-center">{"AI\uAC00 " + mockLibraries.length + "\uAC1C \uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uC88C\uC11D \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD569\uB2C8\uB2E4 \u2022 Powered by OpenAI"}</p>
             </div>
           </div>
         </div>
@@ -159,16 +161,17 @@ export default function RecommendPage() {
       )}
 
       <div className="mt-8 glass rounded-2xl p-6 animate-slide-up" style={{ animationDelay: "500ms" }}>
-        <h3 className="font-bold text-slate-900 mb-4">\uD83D\uDCA1 AI \uC778\uC0AC\uC774\uD2B8</h3>
+        <h3 className="font-bold text-slate-900 mb-4">{"\uD83D\uDCA1 AI \uC778\uC0AC\uC774\uD2B8"}</h3>
         <div className="space-y-3 text-sm text-slate-600">
-          <p>\u2713 \uC804\uAD6D {mockLibraries.length}\uAC1C \uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uC88C\uC11D \uD604\uD669\uC744 \uBD84\uC11D\uD569\uB2C8\uB2E4</p>
-          <p>\u2713 GPT-4o mini \uBAA8\uB378\uC774 \uCD5C\uC801\uC758 \uB3C4\uC11C\uAD00\uC744 \uCD94\uCC9C\uD569\uB2C8\uB2E4</p>
-          <p>\u2713 \uC2DC\uC124, \uD63C\uC7A1\uB3C4, \uC6B4\uC601\uC2DC\uAC04 \uB4F1\uC744 \uC885\uD569 \uACE0\uB824\uD569\uB2C8\uB2E4</p>
+          <p>{"\u2713 \uC804\uAD6D " + mockLibraries.length + "\uAC1C \uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uC88C\uC11D \uD604\uD669\uC744 \uBD84\uC11D\uD569\uB2C8\uB2E4"}</p>
+          <p>{"\u2713 GPT-4o mini \uBAA8\uB378\uC774 \uCD5C\uC801\uC758 \uB3C4\uC11C\uAD00\uC744 \uCD94\uCC9C\uD569\uB2C8\uB2E4"}</p>
+          <p>{"\u2713 \uC2DC\uC124, \uD63C\uC7A1\uB3C4, \uC6B4\uC601\uC2DC\uAC04 \uB4F1\uC744 \uC885\uD569 \uACE0\uB824\uD569\uB2C8\uB2E4"}</p>
         </div>
       </div>
     </div>
   );
 }
+
 function RecommendCard({ library, rank, delay }: { library: LibraryWithDistance & { score: number }; rank: number; delay: number }) {
   const color = getCongestionColor(library.congestionLevel);
   const scoreColor = library.score >= 85 ? "text-emerald-600" : library.score >= 70 ? "text-amber-600" : "text-red-600";
@@ -191,7 +194,7 @@ function RecommendCard({ library, rank, delay }: { library: LibraryWithDistance 
             </div>
             <div className="mb-3">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-semibold text-slate-600">\uC801\uD569\uB3C4</span>
+                <span className="text-xs font-semibold text-slate-600">{"\uC801\uD569\uB3C4"}</span>
                 <span className={`text-sm font-bold ${scoreColor}`}>{library.score}/100</span>
               </div>
               <div className="h-2.5 bg-slate-200 rounded-full overflow-hidden shadow-inner">
@@ -213,10 +216,10 @@ function RecommendCard({ library, rank, delay }: { library: LibraryWithDistance 
               })}
             </div>
             <div className="flex flex-wrap gap-1.5 mt-3">
-              {library.nightOperation && <Tag>\uD83C\uDF19 \uC57C\uAC04</Tag>}
-              {library.accessible && <Tag>\u267F \uC811\uADFC</Tag>}
-              {library.reservable && <Tag>\uD83D\uDCDD \uC608\uC57D</Tag>}
-              {library.wifi && <Tag>\uD83D\uDCF6 \uC640\uC774\uD30C\uC774</Tag>}
+              {library.nightOperation && <Tag>{"\uD83C\uDF19 \uC57C\uAC04"}</Tag>}
+              {library.accessible && <Tag>{"\u267F \uC811\uADFC"}</Tag>}
+              {library.reservable && <Tag>{"\uD83D\uDCDD \uC608\uC57D"}</Tag>}
+              {library.wifi && <Tag>{"\uD83D\uDCF6 \uC640\uC774\uD30C\uC774"}</Tag>}
             </div>
           </div>
           <svg className="w-5 h-5 text-slate-300 shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
