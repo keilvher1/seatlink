@@ -62,9 +62,9 @@ export default function LibraryDetailPage() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={cn(
-              "flex-1 py-3 text-sm font-semibold transition-all duration-300",
-              activeTab === tab 
-                ? "tab-active bg-gradient-to-b from-blue-50 to-transparent" 
+              "flex-1 py-3 text-xs sm:text-sm font-semibold transition-all duration-300",
+              activeTab === tab
+                ? "tab-active bg-gradient-to-b from-blue-50 to-transparent"
                 : "text-slate-500 hover:text-slate-700"
             )}
           >
@@ -73,7 +73,7 @@ export default function LibraryDetailPage() {
         ))}
       </div>
 
-      {/* 탭 콘텐츠 */}
+      {/* 탭 콘텐츨 */}
       <div className="px-4 py-4">
         {activeTab === "열람실 현황" && <RoomStatusTab library={library} />}
         {activeTab === "AI 예측" && <PredictionTab />}
@@ -85,7 +85,7 @@ export default function LibraryDetailPage() {
 }
 
 // ========================
-// 탭1: 열람실 현황
+// 탬1: 열람실 현황
 // ========================
 function RoomStatusTab({ library }: { library: typeof mockLibraries[0] }) {
   const totalPercent = Math.round((library.totalUsed / library.totalSeats) * 100);
@@ -121,10 +121,10 @@ function RoomStatusTab({ library }: { library: typeof mockLibraries[0] }) {
       {/* 전체 요약 */}
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 text-white shadow-xl shadow-slate-900/30">
         <h3 className="font-bold text-lg mb-4">📊 전체 좌석 현황</h3>
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
           {/* 원형 게이지 */}
-          <div className="relative w-28 h-28 shrink-0">
-            <svg className="w-28 h-28 -rotate-90 drop-shadow-lg" viewBox="0 0 100 100">
+          <div className="relative w-24 h-24 sm:w-28 sm:h-28 shrink-0">
+            <svg className="w-24 h-24 sm:w-28 sm:h-28 -rotate-90 drop-shadow-lg" viewBox="0 0 100 100">
               <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="14" />
               <circle
                 cx="50" cy="50" r="42" fill="none"
@@ -139,18 +139,18 @@ function RoomStatusTab({ library }: { library: typeof mockLibraries[0] }) {
               <span className="text-xs text-slate-300 mt-1">이용률</span>
             </div>
           </div>
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-slate-300">총 좌석:</span>
-              <span className="font-bold">{library.totalSeats}석</span>
+          <div className="flex sm:flex-col gap-4 sm:gap-3 text-sm w-full sm:w-auto justify-center">
+            <div className="flex flex-col sm:flex-row sm:justify-between items-center sm:items-start gap-0.5 sm:gap-4">
+              <span className="text-slate-300 text-xs">{"\uCD1D \uC88C\uC11D"}</span>
+              <span className="font-bold">{library.totalSeats}{"\uC11D"}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-slate-300">사용 중:</span>
-              <span className="font-bold text-red-300">{library.totalUsed}석</span>
+            <div className="flex flex-col sm:flex-row sm:justify-between items-center sm:items-start gap-0.5 sm:gap-4">
+              <span className="text-slate-300 text-xs">{"\uC0AC\uC6A9 \uC911"}</span>
+              <span className="font-bold text-red-300">{library.totalUsed}{"\uC11D"}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-slate-300">잔여:</span>
-              <span className="font-bold text-emerald-300">{library.totalAvailable}석</span>
+            <div className="flex flex-col sm:flex-row sm:justify-between items-center sm:items-start gap-0.5 sm:gap-4">
+              <span className="text-slate-300 text-xs">{"\uC794\uC5EC"}</span>
+              <span className="font-bold text-emerald-300">{library.totalAvailable}{"\uC11D"}</span>
             </div>
           </div>
         </div>
@@ -252,7 +252,7 @@ function PredictionTab() {
                 ))}
               </div>
             ))}
-            {/* 범례 */}
+            {/* 범렀 */}
             <div className="flex items-center justify-center gap-2 mt-4 text-[10px] text-slate-600">
               <span className="font-medium">여유</span>
               {[20, 40, 60, 80, 95].map((v) => (
@@ -275,7 +275,7 @@ function TransportTab() {
     <div className="space-y-4 animate-slide-up">
       {/* 공영자전거 */}
       <div className="glass rounded-2xl p-5 border-l-4 border-emerald-600">
-        <h3 className="font-bold text-emerald-900 flex items-center gap-2 mb-4 text-lg">🚲 공영자전거</h3>
+        <h3 className="font-bold text-emerald-900 flex items-center gap-2 mb-4 text-lg">🚲 공영자전거0*/}
         {mockBikeStations.map((s) => (
           <div key={s.id} className="mb-4 last:mb-0">
             <p className="text-sm text-emerald-800 font-semibold">{s.name} ({Math.round(s.distance * 1000)}m)</p>
@@ -292,7 +292,7 @@ function TransportTab() {
       {/* 버스 */}
       <div className="glass rounded-2xl p-5 border-l-4 border-blue-600">
         <h3 className="font-bold text-blue-900 flex items-center gap-2 mb-4 text-lg">🚌 시내버스</h3>
-        <p className="text-xs text-blue-600 font-medium mb-3">정류장: {mockBuses[0]?.stopName} ({Math.round((mockBuses[0]?.stopDistance || 0) * 1000)}m)</p>
+        <p className="text-xs text-blue-600 font-medium mb-3">정류장 : {mockBuses[0]?.stopName} ({Math.round((mockBuses[0]?.stopDistance || 0) * 1000)}m)</p>
         <div className="space-y-2">
           {mockBuses.map((bus) => (
             <div key={bus.routeNumber} className="flex items-center justify-between glass rounded-xl px-4 py-3">
@@ -337,7 +337,7 @@ function ReviewTab() {
     { label: "시설 청결도", score: 4.1 },
     { label: "소음 수준", score: 4.5, note: "조용함" },
     { label: "좌석 편안함", score: 3.8 },
-    { label: "콘센트/와이파이", score: 4.0 },
+    { label: "코센트/와이파이", score: 4.0 },
   ];
 
   return (
@@ -392,7 +392,7 @@ function ReviewTab() {
             <div className="flex items-center gap-4 mt-3 text-xs text-slate-600">
               <button className="hover:text-blue-600 font-medium transition">👍 {review.helpful}</button>
               <button className="hover:text-blue-600 font-medium transition">💬 {review.comments}</button>
-              <button className="hover:text-blue-600 font-medium transition">📌 저장</button>
+              <button className="hover:text-blue-600 font-medium transition">🎌 저장</button>
             </div>
           </div>
         ))}
