@@ -4,6 +4,9 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { mockLibraries } from "@/lib/mock-data";
 import { getCongestionColor, cn } from "@/lib/utils";
 import { LibraryWithDistance } from "@/lib/types";
+import { ShimmerButton } from "@/components/magicui/shimmer-button";
+import { AnimatedShinyText } from "@/components/magicui/animated-shiny-text";
+import { Particles } from "@/components/magicui/particles";
 
 export default function HomePage() {
   const [radius, setRadius] = useState(5);
@@ -22,7 +25,6 @@ export default function HomePage() {
     return list;
   }, [radius, sortBy]);
 
-  // Geolocation handler
   const requestGeolocation = () => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -31,13 +33,11 @@ export default function HomePage() {
           setUserPos([latitude, longitude]);
           if (mapObjRef.current) {
             mapObjRef.current.setView([latitude, longitude], 12);
-            // Update user marker
             updateUserMarker([latitude, longitude]);
           }
         },
         (error) => {
           console.log("Geolocation denied or unavailable:", error);
-          // Fall back to default position
         }
       );
     }
@@ -48,14 +48,11 @@ export default function HomePage() {
     userMarkerRef.current.setLatLng(pos);
   };
 
-  // Init map
   useEffect(() => {
     if (!mapRef.current || mapObjRef.current) return;
 
     const initLeaflet = async () => {
       const L = (await import("leaflet")).default;
-
-      // Fix default icon paths
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
@@ -63,41 +60,22 @@ export default function HomePage() {
         shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
       });
 
-      const map = L.map(mapRef.current!, {
-        center: userPos,
-        zoom: 7,
-        zoomControl: false,
-      });
-
-      // Modern styled tiles
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-        attribution: "",
-        maxZoom: 19,
-      }).addTo(map);
-
-      // Zoom control (top-right)
+      const map = L.map(mapRef.current!, { center: userPos, zoom: 7, zoomControl: false });
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { attribution: "", maxZoom: 19 }).addTo(map);
       L.control.zoom({ position: "topright" }).addTo(map);
 
-      // User location marker
       const userIcon = L.divIcon({
         html: '<div style="width:16px;height:16px;background:#3b82f6;border-radius:50%;border:3px solid white;box-shadow:0 0 0 6px rgba(59,130,246,0.2),0 0 12px rgba(59,130,246,0.4);"></div>',
-        className: "",
-        iconSize: [16, 16],
-        iconAnchor: [8, 8],
+        className: "", iconSize: [16, 16], iconAnchor: [8, 8],
       });
       const userMarker = L.marker(userPos, { icon: userIcon }).addTo(map);
       userMarkerRef.current = userMarker;
-
       markerLayerRef.current = L.layerGroup().addTo(map);
       mapObjRef.current = map;
-
       updateMarkers(L);
-
-      // Fix tile rendering after mount
       setTimeout(() => map.invalidateSize(), 100);
     };
 
-    // Inject Leaflet CSS
     if (!document.getElementById("leaflet-css")) {
       const link = document.createElement("link");
       link.id = "leaflet-css";
@@ -107,8 +85,6 @@ export default function HomePage() {
     }
 
     initLeaflet();
-
-    // Request geolocation on mount
     requestGeolocation();
   }, []);
 
@@ -131,15 +107,12 @@ export default function HomePage() {
           '<div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid white;margin-top:-2px;"></div>' +
           '<div style="background:white;padding:1px 6px;border-radius:6px;margin-top:1px;box-shadow:0 1px 4px rgba(0,0,0,0.1);"><span style="font-size:10px;font-weight:600;color:#334155;">' + lib.name + '</span></div>' +
           '</a>',
-        className: "",
-        iconSize: [80, 70],
-        iconAnchor: [40, 55],
+        className: "", iconSize: [80, 70], iconAnchor: [40, 55],
       });
       L.marker([lib.lat, lib.lng], { icon }).addTo(markerLayerRef.current);
     });
   };
 
-  // Update markers when sorted changes
   useEffect(() => {
     if (!mapObjRef.current) return;
     updateMarkers();
@@ -151,7 +124,7 @@ export default function HomePage() {
       <div className="absolute inset-0">
         <div ref={mapRef} id="map-container" className="w-full h-full z-0" />
 
-        {/* Radius filter */}
+        {/* Radius filter - Magic UI style */}
         <div className="absolute top-4 left-4 flex gap-2 z-[1000] animate-fade-in">
           {[1, 3, 5, 10].map((r, idx) => (
             <button
@@ -160,7 +133,7 @@ export default function HomePage() {
               className={cn(
                 "px-4 py-2 text-sm font-semibold rounded-full backdrop-blur-md transition-all duration-300 transform",
                 radius === r
-                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/40 scale-105"
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/40 scale-105 animate-glow-ring"
                   : "bg-white/80 backdrop-blur-md text-slate-700 hover:shadow-lg hover:scale-105 shadow-md"
               )}
               style={{ transitionDelay: `${idx * 50}ms` }}
@@ -172,7 +145,7 @@ export default function HomePage() {
 
         {/* My location button */}
         <button
-          className="absolute bottom-28 right-4 w-12 h-12 bg-white/90 backdrop-blur-md rounded-full shadow-lg shadow-blue-500/20 flex items-center justify-center z-[1000] hover:bg-white transition-all transform hover:scale-110"
+          className="absolute bottom-28 right-4 w-12 h-12 bg-white/90 backdrop-blur-md rounded-full shadow-lg shadow-blue-500/20 flex items-center justify-center z-[1000] hover:bg-white transition-all transform hover:scale-110 hover:shadow-blue-500/40"
           onClick={requestGeolocation}
         >
           <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -197,8 +170,10 @@ export default function HomePage() {
           {!sheetOpen && (
             <div className="px-6 mt-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-base font-bold text-slate-800">{"\uD83D\uDCCD"} {"\uB0B4 \uC8FC\uBCC0 \uB3C4\uC11C\uAD00"}</span>
-                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">{sorted.length}{"\uAC1C"}</span>
+                <AnimatedShinyText className="text-base font-bold text-slate-800" shimmerWidth={80}>
+                  {"\uD83D\uDCCD"} {"\uB0B4 \uC8FC\uBCC0 \uB3C4\uC11C\uAD00"}
+                </AnimatedShinyText>
+                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full animate-scale-in">{sorted.length}{"\uAC1D"}</span>
               </div>
               <span className="text-xs text-slate-400">{"\u2191"} {"\uC704\uB85C \uBC00\uC5B4 \uC5F4\uAE30"}</span>
             </div>
@@ -208,8 +183,10 @@ export default function HomePage() {
         {sheetOpen && (
           <div className="px-6 pb-4 flex items-center justify-between border-b border-slate-200/50 animate-fade-in">
             <div className="flex items-center gap-3">
-              <span className="text-xl font-bold gradient-text">{"\uD83D\uDCCD"} {"\uB0B4 \uC8FC\uBCC0 \uB3C4\uC11C\uAD00"}</span>
-              <span className="px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">{sorted.length}{"\uAC1C"}</span>
+              <AnimatedShinyText className="text-xl font-bold gradient-text" shimmerWidth={120}>
+                {"\uD83D\uDCCD"} {"\uB0B4 \uC8FC\uBCC0 \uB3C4\uC11C\uAD00"}
+              </AnimatedShinyText>
+              <span className="px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">{sorted.length}{"\uAC1D"}</span>
             </div>
             <select
               value={sortBy}
@@ -230,19 +207,23 @@ export default function HomePage() {
           ))}
 
           {sorted.length === 0 && (
-            <div className="text-center py-12 text-slate-400">
+            <div className="text-center py-12 text-slate-400 relative">
+              <Particles className="absolute inset-0" quantity={20} color="#94a3b8" size={0.8} />
               <p className="text-5xl mb-3 animate-float">{"\uD83D\uDD0D"}</p>
               <p className="font-bold text-slate-600">{"\uBC18\uACBD"} {radius}{"km \uB0B4 \uB3C4\uC11C\uAD00\uC774 \uC5C6\uC2B5\uB2C8\uB2E4"}</p>
               <p className="text-sm mt-2 text-slate-500">{"\uAC80\uC0C9 \uBC18\uACBD\uC744 \uB113\uD600\uBCF4\uC138\uC694"}</p>
             </div>
           )}
 
-          <a
-            href="/recommend"
-            className="block w-full py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white text-center font-bold rounded-2xl hover:shadow-2xl hover:shadow-blue-600/40 transition-all transform hover:scale-105 mt-4 text-lg"
+          <ShimmerButton
+            className="w-full py-4 text-lg rounded-2xl"
+            shimmerColor="rgba(255,255,255,0.3)"
+            background="linear-gradient(110deg, #2563eb, #4f46e5, #2563eb)"
           >
-            {"\uD83E\uDD16"} {"AI \uCD5C\uC801 \uB3C4\uC11C\uAD00 \uCD94\uCC9C\uBC1B\uAE30"}
-          </a>
+            <a href="/recommend" className="flex items-center justify-center gap-2 text-white">
+              {"\uD83E\uDD16"} {"AI \uCD5C\uC801 \uB3C4\uC11C\uAD00 \uCD94\uCC9C\uBC1B\uAE30"}
+            </a>
+          </ShimmerButton>
         </div>
       </div>
     </div>
@@ -255,14 +236,16 @@ function LibraryCard({ library }: { library: LibraryWithDistance }) {
   return (
     <a
       href={`/library/${library.id}`}
-      className="block glass rounded-2xl hover:shadow-xl hover:scale-[1.02] transition-all duration-300 p-4"
+      className="block glass rounded-2xl hover:shadow-xl hover:scale-[1.02] transition-all duration-300 p-4 group relative overflow-hidden"
     >
-      <div className="flex gap-3">
+      {/* Subtle gradient hover effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+      <div className="flex gap-3 relative z-10">
         <div className={cn("w-2 rounded-full shrink-0 shadow-md", color.bg)} />
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <h3 className="font-bold text-[15px] text-slate-900">{library.name}</h3>
+              <h3 className="font-bold text-[15px] text-slate-900 group-hover:text-blue-700 transition-colors">{library.name}</h3>
               <p className="text-xs text-slate-500 mt-1 truncate">{library.address}</p>
             </div>
             <div className="text-right shrink-0">
@@ -293,7 +276,7 @@ function LibraryCard({ library }: { library: LibraryWithDistance }) {
             {library.wifi && <Tag>{"\uD83D\uDCF6 \uC640\uC774\uD30C\uC774"}</Tag>}
           </div>
         </div>
-        <svg className="w-5 h-5 text-slate-300 shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 text-slate-300 shrink-0 mt-1 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </div>
@@ -302,5 +285,5 @@ function LibraryCard({ library }: { library: LibraryWithDistance }) {
 }
 
 function Tag({ children }: { children: React.ReactNode }) {
-  return <span className="px-2.5 py-0.5 bg-slate-200/60 text-slate-700 text-[10px] font-bold rounded-full">{children}</span>;
+  return <span className="px-2.5 py-0.5 bg-slate-200/60 text-slate-700 text-[10px] font-bold rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors">{children}</span>;
 }
