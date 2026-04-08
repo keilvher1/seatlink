@@ -11,14 +11,14 @@ export default function DashboardPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 pb-24 md:pb-8">
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-8 animate-slide-up">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8 animate-slide-up">
         <div>
-          <h1 className="text-3xl font-bold gradient-text">📊 전국 도서관 데이터 대시보드</h1>
-          <p className="text-sm text-slate-500 mt-2">전국 공공도서관의 실시간 이용 현황과 트렌드를 한눈에</p>
+          <h1 className="text-2xl sm:text-3xl font-bold gradient-text">{"\uD83D\uDCCA"} {"\uC804\uAD6D \uB3C4\uC11C\uAD00 \uB370\uC774\uD130 \uB300\uC2DC\uBCF4\uB4DC"}</h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1 sm:mt-2">{"\uC804\uAD6D \uACF5\uACF5\uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uC774\uC6A9 \uD604\uD669\uACFC \uD2B8\uB80C\uB4DC\uB97C \uD55C\uB208\uC5D0"}</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-emerald-600 glass rounded-full px-4 py-2">
+        <div className="flex items-center gap-2 text-xs sm:text-sm text-emerald-600 glass rounded-full px-3 sm:px-4 py-1.5 sm:py-2 self-start sm:self-auto shrink-0">
           <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-          <span className="font-semibold">실시간 업데이트 중</span>
+          <span className="font-semibold">{"\uC2E4\uC2DC\uAC04 \uC5C5\uB370\uC774\uD2B8 \uC911"}</span>
         </div>
       </div>
 
@@ -36,7 +36,7 @@ export default function DashboardPage() {
         <div className="glass rounded-2xl p-6 animate-slide-up" style={{ animationDelay: "100ms" }}>
           <h3 className="font-bold text-slate-900 mb-4 text-lg">⏰ 시간대별 이용률 트렌드</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={mockHourlyTrend} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+            <LineChart data={mockHourlyTrend} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
               <defs>
                 <linearGradient id="colorTrend" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#2563eb" stopOpacity={0.8}/>
@@ -44,8 +44,8 @@ export default function DashboardPage() {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(100,116,139,0.1)" />
-              <XAxis dataKey="time" stroke="#64748b" style={{ fontSize: 12 }} />
-              <YAxis stroke="#64748b" style={{ fontSize: 12 }} />
+              <XAxis dataKey="time" stroke="#64748b" style={{ fontSize: 10 }} interval="preserveStartEnd" />
+              <YAxis stroke="#64748b" style={{ fontSize: 10 }} width={35} />
               <Tooltip 
                 contentStyle={{ 
                   background: "rgba(255,255,255,0.95)", 
@@ -70,9 +70,9 @@ export default function DashboardPage() {
         <div className="glass rounded-2xl p-6 animate-slide-up" style={{ animationDelay: "150ms" }}>
           <h3 className="font-bold text-slate-900 mb-4 text-lg">🗺️ 지역별 이용률</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={mockRegionUsage} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+            <BarChart data={mockRegionUsage} margin={{ top: 5, right: 10, left: -10, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(100,116,139,0.1)" />
-              <XAxis dataKey="region" stroke="#64748b" style={{ fontSize: 12 }} />
+              <XAxis dataKey="region" stroke="#64748b" style={{ fontSize: 10 }} angle={-45} textAnchor="end" interval={0} height={50} />
               <YAxis stroke="#64748b" style={{ fontSize: 12 }} />
               <Tooltip 
                 contentStyle={{ 
@@ -92,18 +92,18 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 하단 섹션 */}
+      {/* 핀단 섹션 */}
       <div className="glass rounded-2xl p-6 animate-slide-up" style={{ animationDelay: "200ms" }}>
         <h3 className="font-bold text-slate-900 mb-4 text-lg">📈 요일별 혼잡도 히트맵</h3>
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
           {mockWeeklyHeatmap.map((item, idx) => {
             const avg = item.hours.reduce((a: number, b: number) => a + b, 0) / item.hours.length;
             const intensity = avg;
             const color = intensity < 33 ? "bg-emerald-400" : intensity < 66 ? "bg-amber-400" : "bg-red-400";
             return (
               <div key={idx} className="text-center">
-                <div className={cn("w-full aspect-square rounded-lg shadow-md transition-all hover:scale-110 cursor-pointer", color, "opacity-70 hover:opacity-100")} title={`${item.day} ${Math.round(avg)}%`} />
-                <p className="text-xs text-slate-600 mt-2 font-medium">{item.day}</p>
+                <div className={cn("w-full aspect-square rounded-md sm:rounded-lg shadow-md transition-all hover:scale-110 cursor-pointer", color, "opacity-70 hover:opacity-100")} title={`${item.day} ${Math.round(avg)}%`} />
+                <p className="text-[10px] sm:text-xs text-slate-600 mt-1 sm:mt-2 font-medium">{item.day} {Math.round(avg)}%</p>
               </div>
             );
           })}
@@ -152,8 +152,8 @@ function KPICard({ icon, label, value, sub, trend, positive, gauge, color = "blu
           </span>
         )}
       </div>
-      <p className="text-xs text-slate-500 font-medium mb-2">{label}</p>
-      <p className={`text-2xl font-bold bg-gradient-to-r ${colorClasses[color]} bg-clip-text text-transparent mb-2`}>{value}</p>
+      <p className="text-[10px] sm:text-xs text-slate-500 font-medium mb-1 sm:mb-2">{label}</p>
+      <p className={`text-lg sm:text-2xl font-bold bg-gradient-to-r ${colorClasses[color]} bg-clip-text text-transparent mb-1 sm:mb-2`}>{value}</p>
       <p className="text-xs text-slate-600">{sub}</p>
       
       {gauge !== undefined && (
