@@ -9,7 +9,7 @@ export default function HomePage() {
   const [radius, setRadius] = useState(5);
   const [sortBy, setSortBy] = useState<"distance" | "seats">("distance");
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [userPos, setUserPos] = useState<[number, number]>([37.5665, 126.978]);
+  const [userPos, setUserPos] = useState<[number, number]>([36.5, 127.5]);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapObjRef = useRef<any>(null);
   const markerLayerRef = useRef<any>(null);
@@ -30,7 +30,7 @@ export default function HomePage() {
           const { latitude, longitude } = position.coords;
           setUserPos([latitude, longitude]);
           if (mapObjRef.current) {
-            mapObjRef.current.setView([latitude, longitude], 14);
+            mapObjRef.current.setView([latitude, longitude], 12);
             // Update user marker
             updateUserMarker([latitude, longitude]);
           }
@@ -65,7 +65,7 @@ export default function HomePage() {
 
       const map = L.map(mapRef.current!, {
         center: userPos,
-        zoom: 14,
+        zoom: 7,
         zoomControl: false,
       });
 
@@ -118,9 +118,9 @@ export default function HomePage() {
     markerLayerRef.current.clearLayers();
 
     const colorMap: Record<string, string> = {
-      "여유": "#22c55e",
-      "보통": "#f59e0b",
-      "혼잡": "#ef4444",
+      "ì¬ì ": "#22c55e",
+      "ë³´íµ": "#f59e0b",
+      "í¼ì¡": "#ef4444",
     };
 
     sorted.forEach((lib) => {
@@ -197,10 +197,10 @@ export default function HomePage() {
           {!sheetOpen && (
             <div className="px-6 mt-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-base font-bold text-slate-800">{"📍"} 내 주변 도서관</span>
-                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">{sorted.length}개</span>
+                <span className="text-base font-bold text-slate-800">{"ð"} ë´ ì£¼ë³ ëìê´</span>
+                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">{sorted.length}ê°</span>
               </div>
-              <span className="text-xs text-slate-400">{"↑"} 위로 밀어 열기</span>
+              <span className="text-xs text-slate-400">{"â"} ìë¡ ë°ì´ ì´ê¸°</span>
             </div>
           )}
         </div>
@@ -208,16 +208,16 @@ export default function HomePage() {
         {sheetOpen && (
           <div className="px-6 pb-4 flex items-center justify-between border-b border-slate-200/50 animate-fade-in">
             <div className="flex items-center gap-3">
-              <span className="text-xl font-bold gradient-text">{"📍"} 내 주변 도서관</span>
-              <span className="px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">{sorted.length}개</span>
+              <span className="text-xl font-bold gradient-text">{"ð"} ë´ ì£¼ë³ ëìê´</span>
+              <span className="px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">{sorted.length}ê°</span>
             </div>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as "distance" | "seats")}
               className="text-sm font-medium text-slate-700 bg-white/80 backdrop-blur-md rounded-lg px-3 py-1.5 border border-slate-200 focus:ring-2 focus:ring-blue-500"
             >
-              <option value="distance">거리순</option>
-              <option value="seats">잔여좌석순</option>
+              <option value="distance">ê±°ë¦¬ì</option>
+              <option value="seats">ìì¬ì¢ìì</option>
             </select>
           </div>
         )}
@@ -231,9 +231,9 @@ export default function HomePage() {
 
           {sorted.length === 0 && (
             <div className="text-center py-12 text-slate-400">
-              <p className="text-5xl mb-3 animate-float">{"🔍"}</p>
-              <p className="font-bold text-slate-600">반경 {radius}km 내 도서관이 없습니다</p>
-              <p className="text-sm mt-2 text-slate-500">검색 반경을 넓혀보세요</p>
+              <p className="text-5xl mb-3 animate-float">{"ð"}</p>
+              <p className="font-bold text-slate-600">ë°ê²½ {radius}km ë´ ëìê´ì´ ììµëë¤</p>
+              <p className="text-sm mt-2 text-slate-500">ê²ì ë°ê²½ì ëíë³´ì¸ì</p>
             </div>
           )}
 
@@ -241,7 +241,7 @@ export default function HomePage() {
             href="/recommend"
             className="block w-full py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white text-center font-bold rounded-2xl hover:shadow-2xl hover:shadow-blue-600/40 transition-all transform hover:scale-105 mt-4 text-lg"
           >
-            {"🤖"} AI 최적 도서관 추천받기
+            {"ð¤"} AI ìµì  ëìê´ ì¶ì²ë°ê¸°
           </a>
         </div>
       </div>
@@ -287,10 +287,10 @@ function LibraryCard({ library }: { library: LibraryWithDistance }) {
             })}
           </div>
           <div className="flex flex-wrap gap-1.5 mt-3">
-            {library.nightOperation && <Tag>{"🌙"} 야간</Tag>}
-            {library.accessible && <Tag>{"♿"} 접근</Tag>}
-            {library.reservable && <Tag>{"📝"} 예약</Tag>}
-            {library.wifi && <Tag>{"📶"} 와이파이</Tag>}
+            {library.nightOperation && <Tag>{"ð"} ì¼ê°</Tag>}
+            {library.accessible && <Tag>{"â¿"} ì ê·¼</Tag>}
+            {library.reservable && <Tag>{"ð"} ìì½</Tag>}
+            {library.wifi && <Tag>{"ð¶"} ìì´íì´</Tag>}
           </div>
         </div>
         <svg className="w-5 h-5 text-slate-300 shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
