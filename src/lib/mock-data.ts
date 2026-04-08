@@ -508,11 +508,11 @@ export const mockStudyGroups: StudyGroup[] = [
     currentMembers: 3, maxMembers: 5,
     schedule: "매일", time: "14:00~18:00",
     description: "수능 수학 기초 풀이 스터디입니다. 키리큐러합 함께 도전해요.",
-    tags: ["수능", "수학", "기초!],
+    tags: ["수능", "수학", "기초"],
   },
   {
-    id: "sg3", title: "토익 900+ 목표반\"
-  }libraryName: "강남구립도서관", location: "제1열람실",
+    id: "sg3", title: "토익 900+ 목표반",
+    libraryName: "강남구립도서관", location: "제1열람실",
     currentMembers: 5, maxMembers: 8,
     schedule: "매주 화·목·토", time: "10:00~12:00",
     description: "토익 900점 이상 목표! LC/RC 파트별로 번갈아 스터디합니다.",
