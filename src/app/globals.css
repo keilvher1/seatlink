@@ -9,10 +9,16 @@
   --indigo-600: 79, 70, 229;
 }
 
+html, body {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(135deg, rgb(var(--background-rgb)), #f0f4f8);
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-text-size-adjust: 100%;
 }
 
 /* ====== GLASSMORPHISM UTILITIES ====== */
