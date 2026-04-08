@@ -175,10 +175,10 @@ function RecommendCard({ library, rank, delay }: { library: LibraryWithDistance 
   const scoreBg = library.score >= 85 ? "from-emerald-600 to-emerald-700" : library.score >= 70 ? "from-amber-600 to-amber-700" : "from-red-600 to-red-700";
 
   return (
-    <div style={{ animationDelay: \`\${delay}ms\` }} className="animate-slide-up">
-      <a href={\`/library/\${library.id}\`} className="glass rounded-2xl p-6 hover:shadow-xl hover:scale-[1.01] transition-all duration-300 block">
+    <div style={{ animationDelay: `${delay}ms` }} className="animate-slide-up">
+      <a href={`/library/${library.id}`} className="glass rounded-2xl p-6 hover:shadow-xl hover:scale-[1.01] transition-all duration-300 block">
         <div className="flex items-start gap-4">
-          <div className={\`w-14 h-14 rounded-full bg-gradient-to-br \${scoreBg} text-white flex items-center justify-center flex-shrink-0 shadow-lg text-lg font-bold\`}>#{rank}</div>
+          <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${scoreBg} text-white flex items-center justify-center flex-shrink-0 shadow-lg text-lg font-bold`}>#{rank}</div>
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-3 mb-2">
               <div>
@@ -192,10 +192,10 @@ function RecommendCard({ library, rank, delay }: { library: LibraryWithDistance 
             <div className="mb-3">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs font-semibold text-slate-600">\uC801\uD569\uB3C4</span>
-                <span className={\`text-sm font-bold \${scoreColor}\`}>{library.score}/100</span>
+                <span className={`text-sm font-bold ${scoreColor}`}>{library.score}/100</span>
               </div>
               <div className="h-2.5 bg-slate-200 rounded-full overflow-hidden shadow-inner">
-                <div className={\`h-full bg-gradient-to-r \${scoreBg} rounded-full transition-all duration-500 shadow-sm\`} style={{ width: \`\${library.score}%\` }} />
+                <div className={`h-full bg-gradient-to-r ${scoreBg} rounded-full transition-all duration-500 shadow-sm`} style={{ width: `${library.score}%` }} />
               </div>
             </div>
             <div className="space-y-2">
@@ -205,7 +205,7 @@ function RecommendCard({ library, rank, delay }: { library: LibraryWithDistance 
                   <div key={room.name} className="flex items-center gap-2 text-xs">
                     <span className="text-slate-600 font-medium w-20 truncate">{room.name}</span>
                     <div className="flex-1 h-2 bg-slate-200/60 rounded-full overflow-hidden shadow-inner">
-                      <div className={cn("h-full rounded-full transition-all duration-500 shadow-sm", roomColor.bg)} style={{ width: \`\${room.congestionPercent}%\` }} />
+                      <div className={cn("h-full rounded-full transition-all duration-500 shadow-sm", roomColor.bg)} style={{ width: `${room.congestionPercent}%` }} />
                     </div>
                     <span className={cn("font-bold w-12 text-right", roomColor.text)}>{room.availableSeats}/{room.totalSeats}</span>
                   </div>
