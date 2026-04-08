@@ -131,6 +131,441 @@ export const mockLibraries: LibraryWithDistance[] = [
     totalSeats: 280, totalUsed: 225, totalAvailable: 55, distance: 325.0, distanceText: "KTX 2시간 30분", travelMinutes: 150,
   },
   {
+    id: "lib-031", name: "부산시립해운대도서관", address: "부산시 해운대구 얒운로 91",
+    lat: 35.1631, lng: 129.1600, phone: "051-749-6581",
+    operatingHours: { weekday: "09:00~21:00", saturday: "09:00~17:00", holiday: "휴관" },
+    nightOperation: true, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 298, seatUsageRate: 45, congestionLevel: "여유",
+    rooms: [
+      { name: "일반열람실", totalSeats: 150, usedSeats: 68, availableSeats: 82, congestionLevel: "여유", congestionPercent: 45, lastUpdated: "2분 전" },
+    ],
+    totalSeats: 150, totalUsed: 68, totalAvailable: 82, distance: 330.0, distanceText: "KTX 2시간 40분", travelMinutes: 160,
+  },
+
+  // ===== 대구광역시 =====
+  {
+    id: "lib-040", name: "대구광역시립중앙도서관", address: "대구시 중구 2·28로 320",
+    lat: 35.8714, lng: 128.6014, phone: "053-231-2100",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "09:00~17:00" },
+    nightOperation: true, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 445, seatUsageRate: 75, congestionLevel: "보통",
+    rooms: [
+      { name: "종합열람실", totalSeats: 180, usedSeats: 135, availableSeats: 45, congestionLevel: "보통", congestionPercent: 75, lastUpdated: "1분 전" },
+      { name: "수험생열람실", totalSeats: 100, usedSeats: 88, availableSeats: 12, congestionLevel: "혼잡", congestionPercent: 88, lastUpdated: "2분 전" },
+    ],
+    totalSeats: 280, totalUsed: 223, totalAvailable: 57, distance: 237.0, distanceText: "KTX 1시간 50분", travelMinutes: 110,
+  },
+
+  // ===== 광주광역시 =====
+  {
+    id: "lib-050", name: "광주광역시립무등도서관", address: "광주시 동구 독립로 268",
+    lat: 35.1459, lng: 126.9219, phone: "062-226-0100",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "09:00~17:00" },
+    nightOperation: true, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 367, seatUsageRate: 58, congestionLevel: "보통",
+    rooms: [
+      { name: "종합열람실", totalSeats: 160, usedSeats: 93, availableSeats: 67, congestionLevel: "보통", congestionPercent: 58, lastUpdated: "2분 전" },
+    ],
+    totalSeats: 160, totalUsed: 93, totalAvailable: 67, distance: 268.0, distanceText: "KTX 1 시간 30분", travelMinutes: 90,
+  },
+
+  // ===== 대전광역시 =====
+  {
+    id: "lib-060", name: "대전한받도서관", address: "대전시 서구 한받대로 300",
+    lat: 36.3504, lng: 127.3845, phone: "042-520-2345",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "09:00~17:00" },
+    nightOperation: true, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 398, seatUsageRate: 62, congestionLevel: "보통",
+    rooms: [
+      { name: "종합열람실", totalSeats: 200, usedSeats: 124, availableSeats: 76, congestionLevel: "보통", congestionPercent: 62, lastUpdated: "1분 전" },
+      { name: "노툸북열람실", totalSeats: 60, usedSeats: 25, availableSeats: 35, congestionLevel: "여유", congestionPercent: 42, lastUpdated: "3분 전" },
+    ],
+    totalSeats: 260, totalUsed: 149, totalAvailable: 111, distance: 140.0, distanceText: "KTX 50분", travelMinutes: 50,
+  },
+
+  // ===== 울산광역시 =====
+  {
+    id: "lib-070", name: "울산광역시립중앙도서관", address: "울산시 남구 중앙로 201",
+    lat: 35.5384, lng: 129.3114, phone: "052-229-6100",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "휴관" },
+    nightOperation: true, accessible: true, reservable: false, wifi: true, parking: true,
+    todayVisitors: 287, seatUsageRate: 52, congestionLevel: "보통",
+    rooms: [
+      { name: "종합열람실", totalSeats: 140, usedSeats: 73, availableSeats: 67, congestionLevel: "보통", congestionPercent: 52, lastUpdated: "2분 전" },
+    ],
+    totalSeats: 140, totalUsed: 73, totalAvailable: 67, distance: 307.0, distanceText: "KTX 2시간 10분", travelMinutes: 130,
+  },
+
+  // ===== 세종특별자치시 =====
+  {
+    id: "lib-080", name: "세종시립도서관", address: "세종시 조치원의 군처로 95",
+    lat: 36.6040, lng: 127.0016, phone: "044-300-8800",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "09:00~17:00" },
+    nightOperation: true, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 215, seatUsageRate: 42, congestionLevel: "여유",
+    rooms: [
+      { name: "종합열람실", totalSeats: 120, usedSeats: 50, availableSeats: 70, congestionLevel: "여유", congestionPercent: 42, lastUpdated: "1분 전" },
+    ],
+    totalSeats: 120, totalUsed: 50, totalAvailable: 70, distance: 120.0, distanceText: "고속버스 1 시간 30분", t�]�[Z[�]\ΈL�K����OOOOH:�%{&�;b�z��;'�;.f:��OOOOB�Y��X�LL��[YN��-�;,�;"�:�z��;!':� �Y�\�Έ��%{&�:��;-�;,�;"�;&){,�:�g�H��]��ˎL��ΈL�ˍ��ۙN����L�
+KMML���\�][���\�Έ��YZ�^N��N���N���]\�^N��N��MΌ��Y^N��g-:� �K��Y��\�][ێ��YKX��\��X�N��YK�\�\��X�N��[�K�Y�N��YK\��[�Έ�YK��^U�\�]ܜΈM��X]\�Y�T�]N��K�ۙ�\�[ۓ]�[��%�;'(�����\Έ��[YN��(�{ej{%�:�;"���[�X]ΈL\�Y�X]Έ�K]�Z[X�T�X]Έ
+�K�ۙ�\�[ۓ]�[��%�;'(��ۙ�\�[۔\��[���K\�\]Y�����;(!�K�K��[�X]ΈL�[\�Y��K�[]�Z[X�N�
+�K\�[��N�
+�K�\�[��U^��U{"�:�!L:����]�[Z[�]\Έ
+��K�Y��X�LLH��[YN���%z�{"�:�z��;!':� �Y�\�Έ��%{&�:��:�%z�{"�:��z�%z�g�
+
+���]��ˍ�LNK�ΈL��
+͌KۙN����M�MLL���\�][���\�Έ��YZ�^N��N��N���]\�^N��N��MΌ��Y^N��g-:� �K��Y��\�][ێ��[�KX��\��X�N��YK�\�\��X�N��[�K�Y�N��YK\��[�Έ�YK��^U�\�]ܜΈL̋�X]\�Y�T�]N���ۙ�\�[ۓ]�[��%�;'(�����\Έ��[YN��(�{ej{%�:�;"���[�X]Έ\�Y�X]Έ��]�Z[X�T�X]Έ
+N�ۙ�\�[ۓ]�[��%�;'(��ۙ�\�[۔\��[���\�\]Y��z��;(!�K�K��[�X]Έ�[\�Y����[]�Z[X�N�
+N\�[��N�M�K�\�[��U^����"�:�!��]�[Z[�]\ΈL��K����OOOOH;-�{,�z��z��OOOOB�Y��X�LL��[YN��,�{(�;"�:�z��;!':� �Y�\�Έ�-�z��H;,�{(�;"�; �z��z�k; �z��z�g
+���]�͋����ΈL�ˍLۙN��
+�L�KML���\�][���\�Έ��YZ�^N��N�������]\�^N��N��N���Y^N��g-:� �K��Y��\�][ێ��YKX��\��X�N��YK�\�\��X�N��YK�Y�N��YK\��[�Έ�YK��^U�\�]ܜΈ�L�X]\�Y�T�]N�
+N�ۙ�\�[ۓ]�[����;a�H�����\Έ��[YN��(�{ej{%�:�;"���[�X]ΈM�\�Y�X]ΈL�]�Z[X�T�X]Έ
+���ۙ�\�[ۓ]�[����;a�H��ۙ�\�[۔\��[��
+N\�\]Y�����;(!�K�K��[�X]ΈM��[\�Y�L��[]�Z[X�N�
+��\�[��N�LL�\�[��U^����;!�z�;"�{"�:�!�:����]�[Z[�]\ΈL�K����OOOOH;-�{,�z�:��OOOOB�Y��X�LLL��[YN��,�;%b;"�:�z��;!':� �Y�\�Έ�-�z�;,�;%b;"�;!':��z�k;)${%fz�gLMH��]�͋�MLK�ΈL�ˌLL�KۙN��
+KML�KL�����\�][���\�Έ��YZ�^N��N�������]\�^N��N��N���Y^N��g-:� �K��Y��\�][ێ��YKX��\��X�N��YK�\�\��X�N��YK�Y�N��YK\��[�Έ�YK��^U�\�]ܜΈ�
+K�X]\�Y�T�]N�
+���ۙ�\�[ۓ]�[����;a�H�����\Έ��[YN��(�{ej{%�:�;"���[�X]ΈM\�Y�X]Έ]�Z[X�T�X]Έ
+L��ۙ�\�[ۓ]�[����;a�H��ۙ�\�[۔\��[��
+��\�\]Y��z��;(!�K�K��[�X]ΈM�[\�Y��[]�Z[X�N�
+L�\�[��N�
+K�\�[��U^����:����]�[Z[�]\Έ��K����OOOOH;(!:�o:��z��OOOOB�Y��X�LL���[YN��(!;(�;"�:�z��;!':� �Y�\�Έ�(!:��H;(!;(�;"�;&a; �:�k;(!;(�:�'{ �
+z�.M���]��K����ΈL�ˌMۙN��
+��L�KLM���\�][���\�Έ��YZ�^N��N�������]\�^N��N��N���Y^N��N��MΌ�K��Y��\�][ێ��YKX��\��X�N��YK�\�\��X�N��YK�Y�N��YK\��[�Έ�YK��^U�\�]ܜΈ�L�X]\�Y�T�]N�
+�ۙ�\�[ۓ]�[��%�;'(�����\Έ��[YN��(�{ej{%�:�;"���[�X]ΈL�\�Y�X]Έ
+��]�Z[X�T�X]Έ
+��ۙ�\�[ۓ]�[��%�;'(��ۙ�\�[۔\��[��
+\�\]Y�����;(!�K�K��[�X]ΈL��[\�Y�
+���[]�Z[X�N�
+�\�[��N���\�[��U^���{"�:�!�:����]�[Z[�]\ΈL�K����OOOOH;(!:�o:�:��OOOOB�Y��X�LL���[YN��%�;"&;"�:�z��; �:��;!':� �Y�\�Έ�(!:�;%�;"&;"�:��; �;'cH;c�{ �:�:�.����]�����͋�ΈL�ˍ�
+�ۙN��
+�KM�NKM�̈���\�][���\�Έ��YZ�^N��N��N���]\�^N��N��MΌ��Y^N��g-:� �K��Y��\�][ێ��[�KX��\��X�N��YK�\�\��X�N��[�K�Y�N��YK\��[�Έ�YK��^U�\�]ܜΈMM��X]\�Y�T�]N�̋�ۙ�\�[ۓ]�[��%�;'(�����\Έ��[YN��(�{ej{%�:�;"���[�X]Έ\�Y�X]Έ��]�Z[X�T�X]Έ
+M�ۙ�\�[ۓ]�[��%�;'(��ۙ�\�[۔\��[��̋\�\]Y��z��;(!�K�K��[�X]Έ�[\�Y����[]�Z[X�N�
+M\�[��N��L�\�[��U^���
+��;"��"�:�!��]�[Z[�]\ΈN�K�Y��X�LL�H��[YN���{c�;"�:�z��;!':� �Y�\�Έ�(!:�:�{c�;"�;& { �:�gMMH��]���LN�ΈL����L��ۙN��
+�KL��N
+���\�][���\�Έ��YZ�^N��N���N���]\�^N��N��MΌ��Y^N��g-:� �K��Y��\�][ێ��YKX��\��X�N��YK�\�\��X�N��YK�Y�N��YK\��[�Έ�YK��^U�\�]ܜΈNN�X]\�Y�T�]N�
+�ۙ�\�[ۓ]�[��%�;'(�����\Έ��[YN��(�{ej{%�:�;"���[�X]ΈL\�Y�X]Έ
+]�Z[X�T�X]Έ
+��ۙ�\�[ۓ]�[��%�;'(��ۙ�\�[۔\��[��
+\�\]Y�����;(!�K�K��[�X]ΈL�[\�Y�
+�[]�Z[X�N�
+�\�[��N��L�\�[��U^����"�:�!�:����]�[Z[�]\ΈML�K����OOOOH:��{ �z��z��OOOOB�Y��X�LM��[YN��c�;ek{"�:�{)${%fz��;!':� �Y�\�Έ���z��H;c�;ek{"�:�:�k;)${%fz�g
+̈��]�͋�NL�ΈL�K���KۙN��
+ML��L�����\�][���\�Έ��YZ�^N��N�������]\�^N��N��N���Y^N��g-:� �K��Y��\�][ێ��YKX��\��X�N��YK�\�\��X�N��YK�Y�N��YK\��[�Έ�YK��^U�\�]ܜΈ��K�X]\�Y�T�]N�
+MK�ۙ�\�[ۓ]�[����;a�H�����\Έ��[YN��(�{ej{%�:�;"���[�X]ΈL�\�Y�X]Έ
+��]�Z[X�T�X]Έ
+M�ۙ�\�[ۓ]�[����;a�H��ۙ�\�[۔\��[��
+MK\�\]Y�����;(!�K�K��[�X]ΈL��[\�Y�
+���[]�Z[X�N�
+M\�[��N����\�[��U^���
+��;"��"�:�!�:����]�[Z[�]\ΈML�K����OOOOH:��{ �z�:��OOOOB�Y��X�LML��[YN��,/{&�;"�:�z��; �:��;!':� �Y�\�Έ���z�;,/{&�;"�:��; �;ej{c�:�k��Mz� :�g��H��]��K�M�N�ΈL��M̎ۙN��
+MKL��KML���\�][���\�Έ��YZ�^N��N�������]\�^N��N��N���Y^N��g-:� �K��Y��\�][ێ��YKX��\��X�N��YK�\�\��X�N��YK�Y�N��YK\��[�Έ�YK��^U�\�]ܜΈ���X]\�Y�T�]N�
+��ۙ�\�[ۓ]�[����;a�H�����\Έ��[YN��(�{ej{%�:�;"���[�X]ΈML\�Y�X]ΈL�]�Z[X�T�X]Έ
+�ۙ�\�[ۓ]�[����;a�H��ۙ�\�[۔\��[��
+�\�\]Y��z��;(!�K�K��[�X]ΈML�[\�Y�L��[]�Z[X�N�
+\�[��N��L�\�[��U^����"�:�!��]�[Z[�]\ΈL��K����OOOOH;(';(�;b�z��;'�;.f:��OOOOB�Y��X�LM���[YN��(';(�;"�:�z��;!':� �Y�\�Έ�(';(�;"�;'m:�����HM�NKL���]��ˍNM��ΈL���L�L�ۙN��
+�M̎N
+����\�][���\�Έ��YZ�^N��N���N���]\�^N��N��MΌ��Y^N��g-:� �K��Y��\�][ێ��YKX��\��X�N��YK�\�\��X�N��YK�Y�N��YK\��[�Έ�YK��^U�\�]ܜΈ�L�X]\�Y�T�]N���ۙ�\�[ۓ]�[��%�;'(�����\Έ��[YN��(�{ej{%�:�;"���[�X]ΈLL\�Y�X]Έ
+�]�Z[X�T�X]Έ
+��ۙ�\�[ۓ]�[��%�;'(��ۙ�\�[۔\��[���\�\]Y�����;(!�K�K��[�X]ΈLL�[\�Y�
+��[]�Z[X�N�
+�\�[��N�
+
+L�\�[��U^���a;e�z�,{"�:�!��]�[Z[�]\Έ
+��K�Y��X�LM�H��[YN��!':��;c�;"�:�z��;!':� �Y�\�Έ�(';(�;!':��;c�;"�;)${%fz�gL
+H��]��ˌ�MK�ΈL���M�ۙN��
+�M͌L�
+̈���\�][���\�Έ��YZ�^N��N��N���]\�^N��N��MΌ��Y^N��g-:� �K��Y��\�][ێ��[�KX��\��X�N��YK�\�\��X�N��[�K�Y�N��YK\��[�Έ�YK��^U�\�]ܜΈM
+K�X]\�Y�T�]N��K�ۙ�\�[ۓ]�[��%�;'(�����\Έ��[YN��(�{ej{%�:�;"���[�X]Έ\�Y�X]Έ�]�Z[X�T�X]Έ
+��ۙ�\�[ۓ]�[��%�;'(��ۙ�\�[۔\��[���K\�\]Y��z��;(!�K�K��[�X]Έ�[\�Y���[]�Z[X�N�
+�\�[��N�
+
+��\�[��U^���a;e�z�,
+��;"�{"�:�!�:����]�[Z[�]\ΈL�K�N���OOOOOOOOOOOOOOOOOOOOOOOB���RH;&";.(H:�{%�H:�l;'m;a,���OOOOOOOOOOOOOOOOOOOOOOOB�^ܝ�ۜ�[����YX�[ێ��YX�[ۑ]V�HH��\���
+����ۙ�\�[ێ�\�\���YHK���\���
+Ό��ۙ�\�[ێ�L�\�\���YHK���\������ۙ�\�[ێ��\�\���YHK���\���N���ۙ�\�[ێ�
+\�\���YHK���\���L���ۙ�\�[ێ�
+�\�\���YHK���\���LN���ۙ�\�[ێ��\�\���YHK���\���L����ۙ�\�[ێ�
+��\�\���YHK���\���LΌ��ۙ�\�[ێ�
+MK\�\���[�HK���\���M���ۙ�\�[ێ�
+�\�\���[�HK���\���MN���ۙ�\�[ێ�
+\�\���[�HK���\���M����ۙ�\�[ێ�
+��\�\���[�HK���\���MΌ��ۙ�\�[ێ�
+�K\�\���[�HK���\���N���ۙ�\�[ێ�\�\���[�HK���\���NN���ۙ�\�[ێ�L�\�\���[�HK���\�������ۙ�\�[ێ�
+�\�\���[�HK���\����N���ۙ�\�[ێ�
+L\�\���[�HK���\��������ۙ�\�[ێ��\�\���[�HK�N�^ܝ�ۜ�[����YZ�RX]X\��YZ�RX]X\]V�HH�^N��&���\�Έ�KL�K
+L
+�
+K
+�K
+
+K�K
+�
+�
+�
+MK�LHK��^N��fe��\�Έ�KL��
+MK
+̋
+�
+��
+
+K
+��
+�K
+K
+�
+L��HK��^N��"&��\�Έ�MK̋
+N
+�K�
+N
+�K
+
+�KL�
+N̋L�HK��^N���H��\�Έ͋L�
+L�
+�
+�
+MK�̋
+
+N
+̋�
+�K
+L�KHK��^N���"��\�Έ�K��
+
+K
+��
+̋
+L�K��
+MK
+�
+�
+�
+
+K��
+WHK��^N��a���\�Έ��
+KL��K
+L
+�
+�K
+�
+�
+��
+MK
+
+�N
+WHK��^N��'o��\�Έ̋�MK�K�K
+�
+
+L�
+L
+
+K
+�K��L��HK�N���OOOOOOOOOOOOOOOOOOOOOOOB���:�d;a�H:�{%�H:�l;'m;a,���OOOOOOOOOOOOOOOOOOOOOOOB�^ܝ�ۜ�[��КZ�T�][ۜΈ�Z�T�][ۖ�HH�Y���Z�KLH��[YN��!.;(�z� :�g; �:�l:�:� ;%�;!��]��ˍM��ΈL���M͋]�Z[X�P�Z�\Έ
+K�[���ΈMK\�[��N��
+HK��Y���Z�KL���[YN��"�;,�{%�H��;-�:�k:� ;%�;!��]��ˍM�K�ΈL���M��]�Z[X�P�Z�\Έ�[���Έ�\�[��N��L�K�N�^ܝ�ۜ�[��Н\�\Έ�\�[����HH���]S�[X�\������\��]�[Z[�]\Έ����[YN��!.;(�z� :�g; �:�l:����\�[��N���K����]S�[X�\���LH�\��]�[Z[�]\Έ���[YN��!.;(�z� :�g; �:�l:����\�[��N���K����]S�[X�\����
+ȋ\��]�[Z[�]\ΈMK���[YN��!';&�;%�H���\�[��N��HK�N�^ܝ�ۜ�[���X��\��X�U�[��ܝ�X��\��X�U�[��ܝH�[�\��[YN��)$z�k:�d;a�{%o{'�;'m:��{)�;&�;!/;a,��]�Z[X�U�ZX�\Έ���[�ZX�\Έ�\�[X]Y�Z]�MK�N���OOOOOOOOOOOOOOOOOOOOOOOB���:� ;"�:��:��:�{%�H:�l;'m;a,���OOOOOOOOOOOOOOOOOOOOOOOB�^ܝ�ۜ�[���\���\��N�\���\��HH�[X��\�Y\Έ̍
+���\��[�\�\�Έ
+
+N̋�]�\�Y�U\�Y�T�]N�
+�ˌ���[]�Z[X�T�X]Έ
+L�M���[�X]ΈMN�N�^ܝ�ۜ�[��ԙY�[ە\�Y�N��Y�[ە\�Y�V�HH��Y�[ێ��!';&��\�Y�T�]N�
+�K���Y�[ێ����z�,�\�Y�T�]N�
+̈K���Y�[ێ����; ��\�Y�T�]N�
+�K���Y�[ێ��� :�k�\�Y�T�]N�
+�HK���Y�[ێ��'n;,��\�Y�T�]N�
+��K���Y�[ێ���${(��\�Y�T�]N�
+�K���Y�[ێ��� ;(!�\�Y�T�]N�
+NK���Y�[ێ��&�; ��\�Y�T�]N�
+MHK���Y�[ێ��!.;(�H�\�Y�T�]N�
+L�K���Y�[ێ����z��\�Y�T�]N�
+LK���Y�[ێ��-�z��\�Y�T�]N�
+K���Y�[ێ��(!:��\�Y�T�]N�
+
+HK���Y�[ێ����z��H�\�Y�T�]N�
+�K���Y�[ێ��-�z��H�\�Y�T�]N�
+�K���Y�[ێ��(!:��H�\�Y�T�]N�
+K���Y�[ێ���%{&��\�Y�T�]N��K���Y�[ێ��(';(��\�Y�T�]N��HK�N�^ܝ�ۜ�[����\�U�[���\�U�[��HH��\���
+����^N�\��YZΈ
+�K���\���
+Ό��^N�MK\��YZΈL�K���\������^N�̋\��YZΈ�K���\���N���^N�
+MK\��YZΈ
+LK���\���L���^N�
+̋\��YZΈ
+�K���\���LN���^N�
+K\��YZΈK���\���L����^N�
+�K\��YZΈ
+��K���\���LΌ��^N�
+N\��YZΈ
+MHK���\���M���^N�
+
+K\��YZΈ
+K���\���MN���^N�
+L�\��YZΈ
+LK���\���M����^N�
+�\��YZΈ
+�HK���\���MΌ��^N�
+�\��YZΈ
+̈K���\���N���^N�\��YZΈ�K���\���NN���^N�L�\��YZΈ
+HK���\�������^N�\��YZΈ
+�HK���\����N���^N�
+MK\��YZΈ
+LK���\��������^N���\��YZΈNK�N���OOOOOOOOOOOOOOOOOOOOOOOB���;.�:�:��;b�:�{%�H:�l;'m;a,���OOOOOOOOOOOOOOOOOOOOOOOB�^ܝ�ۜ�[��ԙ]�Y]�Έ�]�Y]��HHY���H�\�\�Y��LH�\�\��[YN���`
+�"&��X��\�RY��X�LH�X��\�S�[YN��!';&�;)${%fz��;!':� ����S�[YN��'o:�&;%�:�;"���[����'�*�;(l;&�{em;&����۝[����.-H;%�:�;"�;)�:�";(l;&�{ef:��;'�:�:��:�"z�"{em;&��;/f;!/;b�;'�:�:�:�l;'f;,/;)�:��;'o:�&;'�:�:�;%�;'(;'�;"�z��:��<'�cH��[�[�����[Y[�Έ�ܙX]Y]��Mz��;(!��K�Y�����\�\�Y��L��\�\��[YN��'m
+�%���X��\�RY��X�LȋX��\�S�[YN����;c�;)${%fz��;!':� ����S�[YN��(�{ej{%�:�;"���[����'䪈;)�{)$H;'�:��;&����۝[���&):�;%�:�,:��;'!:�,;-g:��;'�z��:���; �:�:��;( z��;%�;%�;.�:��;( {(";em;&��;&):�;%b{%a;'�:�,;(��%a;&����[�[�MK��[Y[�ΈKܙX]Y]��̺��;(!��K�Y���ȋ\�\�Y��Lȋ\�\��[YN���%J�f.��X��\�RY��X�L��X��\�S�[YN���%z�:�k:�z��;!':� ��[����'�,:��{'�{em;&����۝[����P�L�HP�Q�P���P̑MPP��P��NP�P��P�LQP���P�QP͎M�P��LP�PP�P��LWP����P��P�M�P����P��P͌�P�MMP�M��Q
+M�WP���P��M�WP�L�WP��PQ�P�NP�P�PQP�P�̑WP�MNP�P�P͎M���[�[��K��[Y[�Έ
+KܙX]Y]��{"�:�!;(!��K�Y����\�\�Y��M�\�\��[YN��-g
+�)���X��\�RY��X�L��X��\�S�[YN����; �;"�:�{"�:��:��;!':� ����S�[YN���%;)�;a.;%�:�;"���[����'�"�;(��%a;&����۝[����%;)�;a.;%�:�;"�:�:�:�n:��{ef:��:�;!';(%z��;(��%a;(c;%�;&�H:�:��;a,:��;`k:��;'f;'�:��;c�;em;&����[�[�
+���[Y[�Έ
+�ܙX]Y]���"�:�!;(!��K�Y���H�\�\�Y��MH�\�\��[YN��(%J�f!��X��\�RY��X�L
+��X��\�S�[YN��P��P�
+Q
+MP�P�̑P���P�LP�PQ����S�[YN��P�M�Q��P�WP�
+���[����'�"�;(��%a;&����۝[���P�M�Q��P�WP�
+�P��LP�PP�P�LL�P�LL�Q
+MNPP�LPэNP�L��Q��P�NWP�
+Q
+M�WP���P��M�P͍P���Q��P���P���P�M�P�N
+WP���P��M�P��NP���P̑P��NP��
+WP��P�MP�ѐ�P͎M���[�[�N��[Y[�Έ�ܙX]Y]���"�:�!;(!��K�N�^ܝ�ۜ�[����YQܛ�\Έ�YQܛ�\�HHY����H�]N����z�-;&�;"�;e�;"�;a,:�%��X��\�S�[YN��!';&�;)${%fz��;!':� ���][ێ���.-H;%�:�;"����\��[�Y[X�\�Έ
+X^Y[X�\�Έ
+����Y[N����;(�;&�0��"&0���"�[YN��N��LΌ��\�ܚ\[ێ��e�{(%z�K;e�:�H:�&{'m:��z��;ef;"�:��:�;)�{ejz��:���;!':�g;)�:�.;ef:��:�;'f:��; �;ej:��;d�;%�;&�H��Y�ΈȺ��z�-;&���e�{(%z�H��e�:�H�K�K�Y���̈�]N��"&:�H;"&;efH;"�;a,:�%��X��\�S�[YN����;c�;)${%fz��;!':� ���][ێ��(�{ej{%�:�;"����\��[�Y[X�\�Έ�X^Y[X�\�Έ
+K���Y[N����;'o�[YN��M��N���\�ܚ\[ێ��"&:�H;"&;efH:�,;-";d�;'m;"�;a,:�%;'�z��:���;.�:�;`d:��;ej:��:��;(!;em;&����Y�ΈȻ"&:�H��"&;efH���,;-"�K�K�Y����ȋ]N��a�;'mHL
+�:�{dg:�&��X��\�S�[YN���%z�:�k:�z��;!':� ���][ێ��('{%�:�;"����\��[�Y[X�\�Έ
+KX^Y[X�\�Έ���Y[N����;(�;fe0���p��a��[YN��L��L����\�ܚ\[ێ��a�;'mHL;($;'m; �H:�{dgH�Ԑ�;c#;b�:��:�g:�:�";%a;"�;a,:�%;ejz��:�����Y�ΈȻa�;'mH��& {%����RPȗK�K�Y�����]N��'��;'n:�.;efH:��{!':�;'���X��\�S�[YN��!�{c#:�k:�z��;!':� ���][ێ��'�;'(;%�:�;"����\��[�Y[X�\�Έ
+�X^Y[X�\�ΈL���Y[N����{(�;'o;&�;'o�[YN��M��M����\�ܚ\[ێ��eg:��;%����;'n:�.;efH;,a{'a;'oz��;a�:�h;ejz��:���;c�;ef:��;&);!.;&�H��Y�ΈȺ��{!'��'n:�.;efH��a�:�h�K�K�N�import {
+  Library,
+  LibraryWithDistance,
+  PredictionData,
+  WeeklyHeatmapData,
+  BikeStation,
+  BusInfo,
+  AccessibleTransport,
+  DashboardKPI,
+  RegionUsage,
+  HourlyTrend,
+  Review,
+  StudyGroup,
+} from "./types";
+
+// ========================
+// 전국 도서관 목업 데이터
+// ========================
+export const mockLibraries: LibraryWithDistance[] = [
+  // ===== 서울특별시 =====
+  {
+    id: "lib-001", name: "서울중앙도서관", address: "서울시 중구 세종대로 110",
+    lat: 37.5636, lng: 126.975, phone: "02-2133-0300",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "09:00~17:00" },
+    nightOperation: true, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 482, seatUsageRate: 60, congestionLevel: "보통",
+    rooms: [
+      { name: "일반열람실", totalSeats: 80, usedSeats: 48, availableSeats: 32, congestionLevel: "보통", congestionPercent: 60, lastUpdated: "2분 전" },
+      { name: "노트북열람실", totalSeats: 60, usedSeats: 18, availableSeats: 42, congestionLevel: "여유", congestionPercent: 30, lastUpdated: "2분 전" },
+      { name: "수험생열람실", totalSeats: 100, usedSeats: 88, availableSeats: 12, congestionLevel: "혼잡", congestionPercent: 88, lastUpdated: "1분 전" },
+    ],
+    totalSeats: 240, totalUsed: 154, totalAvailable: 86, distance: 1.2, distanceText: "도보 15분", travelMinutes: 15,
+  },
+  {
+    id: "lib-002", name: "강남구립도서관", address: "서울시 강남구 선릉로 668",
+    lat: 37.5045, lng: 127.049, phone: "02-3448-4646",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "휴관" },
+    nightOperation: true, accessible: true, reservable: false, wifi: true, parking: false,
+    todayVisitors: 325, seatUsageRate: 78, congestionLevel: "혼잡",
+    rooms: [
+      { name: "제1열람실", totalSeats: 60, usedSeats: 52, availableSeats: 8, congestionLevel: "혼잡", congestionPercent: 87, lastUpdated: "3분 전" },
+      { name: "제2열람실", totalSeats: 40, usedSeats: 38, availableSeats: 2, congestionLevel: "혼잡", congestionPercent: 95, lastUpdated: "1분 전" },
+    ],
+    totalSeats: 100, totalUsed: 90, totalAvailable: 10, distance: 3.8, distanceText: "버스 20분", travelMinutes: 20,
+  },
+  {
+    id: "lib-003", name: "마포중앙도서관", address: "서울시 마포구 성암로 137",
+    lat: 37.5665, lng: 126.899, phone: "02-3153-5800",
+    operatingHours: { weekday: "09:00~18:00", saturday: "09:00~18:00", holiday: "휴관" },
+    nightOperation: false, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 198, seatUsageRate: 25, congestionLevel: "여유",
+    rooms: [
+      { name: "종합열람실", totalSeats: 120, usedSeats: 30, availableSeats: 90, congestionLevel: "여유", congestionPercent: 25, lastUpdated: "1분 전" },
+    ],
+    totalSeats: 120, totalUsed: 30, totalAvailable: 90, distance: 0.8, distanceText: "도보 10분", travelMinutes: 10,
+  },
+  {
+    id: "lib-004", name: "송파구립도서관", address: "서울시 송파구 올리픽로 326",
+    lat: 37.5145, lng: 127.1055, phone: "02-2147-2200",
+    operatingHours: { weekday: "09:00~21:00", saturday: "09:00~17:00", holiday: "휴관" },
+    nightOperation: true, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 312, seatUsageRate: 38, congestionLevel: "여유",
+    rooms: [
+      { name: "일반열람실", totalSeats: 100, usedSeats: 35, availableSeats: 65, congestionLevel: "여유", congestionPercent: 35, lastUpdated: "1분 전" },
+      { name: "노트북존", totalSeats: 40, usedSeats: 18, availableSeats: 22, congestionLevel: "여유", congestionPercent: 45, lastUpdated: "3분 전" },
+    ],
+    totalSeats: 140, totalUsed: 53, totalAvailable: 87, distance: 5.1, distanceText: "버스 25분", travelMinutes: 25,
+  },
+
+  // ===== 경기도 =====
+  {
+    id: "lib-010", name: "수원시립중앙도서관", address: "경기도 수원시 팔달구 효원로 304",
+    lat: 37.2636, lng: 127.0286, phone: "031-228-4700",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "09:00~17:00" },
+    nightOperation: true, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 410, seatUsageRate: 72, congestionLevel: "보통",
+    rooms: [
+      { name: "종합열람실", totalSeats: 150, usedSeats: 108, availableSeats: 42, congestionLevel: "보통", congestionPercent: 72, lastUpdated: "2분 전" },
+      { name: "디지털열람실", totalSeats: 60, usedSeats: 30, availableSeats: 30, congestionLevel: "여유", congestionPercent: 50, lastUpdated: "3분 전" },
+    ],
+    totalSeats: 210, totalUsed: 138, totalAvailable: 72, distance: 32.5, distanceText: "전철 50분", travelMinutes: 50,
+  },
+  {
+    id: "lib-011", name: "성남시립분당도서관", address: "경기도 성남시 분당구 불정로 20",
+    lat: 37.3595, lng: 127.1086, phone: "031-729-4600",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "휴관" },
+    nightOperation: true, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 356, seatUsageRate: 65, congestionLevel: "보통",
+    rooms: [
+      { name: "일반열람실", totalSeats: 200, usedSeats: 130, availableSeats: 70, congestionLevel: "보통", congestionPercent: 65, lastUpdated: "1분 전" },
+    ],
+    totalSeats: 200, totalUsed: 130, totalAvailable: 70, distance: 18.2, distanceText: "전철 35분", travelMinutes: 35,
+  },
+  {
+    id: "lib-012", name: "고양시립대화도서관", address: "경기도 고양시 일산서구 대화동 2606",
+    lat: 37.6765, lng: 126.7452, phone: "031-8075-9140",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "휴관" },
+    nightOperation: true, accessible: true, reservable: false, wifi: true, parking: true,
+    todayVisitors: 278, seatUsageRate: 55, congestionLevel: "보통",
+    rooms: [
+      { name: "종합열람실", totalSeats: 120, usedSeats: 66, availableSeats: 54, congestionLevel: "보통", congestionPercent: 55, lastUpdated: "2분 전" },
+    ],
+    totalSeats: 120, totalUsed: 66, totalAvailable: 54, distance: 22.1, distanceText: "전철 40분", travelMinutes: 40,
+  },
+
+  // ===== 인천광역시 =====
+  {
+    id: "lib-020", name: "인천광역시립중앙도서관", address: "인천시 남동구 정각로 9",
+    lat: 37.4482, lng: 126.7014, phone: "032-440-8700",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "09:00~17:00" },
+    nightOperation: true, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 389, seatUsageRate: 68, congestionLevel: "보통",
+    rooms: [
+      { name: "종합열람실", totalSeats: 180, usedSeats: 122, availableSeats: 58, congestionLevel: "보통", congestionPercent: 68, lastUpdated: "1분 전" },
+      { name: "노트북열람실", totalSeats: 50, usedSeats: 20, availableSeats: 30, congestionLevel: "여유", congestionPercent: 40, lastUpdated: "2분 전" },
+    ],
+    totalSeats: 230, totalUsed: 142, totalAvailable: 88, distance: 35.0, distanceText: "전철 55분", travelMinutes: 55,
+  },
+
+  // ===== 부산광역시 =====
+  {
+    id: "lib-030", name: "부산시립시민도서관", address: "부산시 부산진구 중앙대로 678",
+    lat: 35.1547, lng: 129.0603, phone: "051-810-8200",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "09:00~17:00" },
+    nightOperation: true, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 520, seatUsageRate: 82, congestionLevel: "혼잡",
+    rooms: [
+      { name: "종합열람실", totalSeats: 200, usedSeats: 170, availableSeats: 30, congestionLevel: "혼잡", congestionPercent: 85, lastUpdated: "1분 전" },
+      { name: "디지털열람실", totalSeats: 80, usedSeats: 55, availableSeats: 25, congestionLevel: "보통", congestionPercent: 69, lastUpdated: "2분 전" },
+    ],
+    totalSeats: 280, totalUsed: 225, totalAvailable: 55, distance: 325.0, distanceText: "KTX 2시간 30분", travelMinutes: 150,
+  },
+  {
     id: "lib-031", name: "부산시립해운대도서관", address: "부산시 해운대구 양운로 91",
     lat: 35.1631, lng: 129.1600, phone: "051-749-6581",
     operatingHours: { weekday: "09:00~21:00", saturday: "09:00~17:00", holiday: "휴관" },
