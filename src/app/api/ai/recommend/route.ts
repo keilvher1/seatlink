@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     "10. Mention operating hours when relevant"
   ].join("\n");
 
-  const result = streamText({
+  const result = await streamText({
     model: gateway("openai/gpt-4o-mini"),
     system: systemPrompt,
     messages,
