@@ -87,7 +87,7 @@ export default function RecommendPage() {
 
   const quickQuestions = [
     "\uC9C0\uAE08 \uAC00\uC7A5 \uC5EC\uC720\uB85C\uC6B4 \uB3C4\uC11C\uAD00 \uCD94\uCC9C\uD574\uC918",
-    "\uC57C\uAC04\uC5D0 \uC6B4\uC601\uD558\uB294 \uB3C4\uC11C\uAD00 \uC54C\uB824\uC918",
+    "\uC57C\uAC04\uC5D0 \uC6B4\uC601\uD558\uB294 \uB3C4\uC11C\uAD00 \uC54C\uB424\uC918",
     "\uC11C\uC6B8\uC5D0\uC11C WiFi\uB418\uB294 \uC870\uC6A9\uD55C \uB3C4\uC11C\uAD00\uC748?",
     "\uC8FC\uCC28 \uAC00\uB2A5\uD55C \uB3C4\uC11C\uAD00 \uCD94\uCC9C\uD574\uC918",
   ];
@@ -140,19 +140,8 @@ export default function RecommendPage() {
                       ))}
                     </div>
                   </div>
-                }
-                {<íax9 {
-                    <div className="text-5xl mb-4 animate-float">{"\uD83E\uDD16"}</div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-2">{"AI \uB3C4\uC11C\uAD00 \uCD94\uCC9C \uC5B4\uC2DC\uC2A4\uD134\uD2B8"}</h3>
-                    <p className="text-sm text-slate-500 mb-6">{"\uC804\uAD6D " + mockLibraries.length + "\uAC1C \uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD558\uC5EC"}<br />{"\uCD5C\uC801\uC758 \uB3C4\uC11C\uAD00\uC744 \uCD94\uCC9C\uD574\uB4DC\uB9BD\uB2C8\uB2E4."}</p>
-                    <div className="flex flex-wrap gap-2 justify-center max-w-md mx-auto">
-                      {quickQuestions.map((q) => (
-                        <button key={q} onClick={() => { setInput(q); setTimeout(() => { const btn = document.getElementById("send-btn"); if (btn) btn.click(); }, 100); }} className="px-3 py-2 bg-violet-50 hover:bg-violet-100 text-violet-700 text-xs font-medium rounded-full transition-all hover:scale-105 hover:shadow-md">{q}</button>
-                      ))}
-                    </div>
-                  </div>
-                }
-                {=messages.map((msg, idx) => (
+                )}
+                {messages.map((msg, idx) => (
                   <div key={idx} className={cn("flex gap-3", msg.role === "user" ? "justify-end" : "justify-start")} style={{ animationDelay: `${idx * 50}ms` }}>
                     {msg.role === "assistant" && (<div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center flex-shrink-0 text-white text-sm shadow-md animate-scale-in">AI</div>)}
                     <div className={cn("max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap animate-scale-in", msg.role === "user" ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-br-md shadow-md" : "bg-white/80 text-slate-800 rounded-bl-md shadow-sm border border-slate-100")}>
@@ -263,7 +252,8 @@ function RecommendCard({ library, rank, delay }: { library: LibraryWithDistance 
                   );
                 })}
               </div>
-              <div className="flex flex-wrap gap-1.5 mt-3"></div>                {library.nightOperation && <Tag>{"\uD83C\uDF19 \uC57C\uAC04"}</Tag>}
+              <div className="flex flex-wrap gap-1.5 mt-3">
+                {library.nightOperation && <Tag>{"\uD83C\uDF19 \uC57C\uAC04"}</Tag>}
                 {library.accessible && <Tag>{"\u267F \uC811\uADFC"}</Tag>}
                 {library.reservable && <Tag>{"\uD83D\uDCDD \uC608\uC57D"}</Tag>}
                 {library.wifi && <Tag>{"\uD83D\uDCF6 \uC640\uC774\uD30C\uC774"}</Tag>}
