@@ -263,8 +263,7 @@ function RecommendCard({ library, rank, delay }: { library: LibraryWithDistance 
                   );
                 })}
               </div>
-              <div class="flex flex-wrap gap-1.5 mt-3">
-                {library.nightOperation && <Tag>{"\uD83C\uDF19 \uC57C\uAC04"}</Tag>}
+              <div className="flex flex-wrap gap-1.5 mt-3"></div>                {library.nightOperation && <Tag>{"\uD83C\uDF19 \uC57C\uAC04"}</Tag>}
                 {library.accessible && <Tag>{"\u267F \uC811\uADFC"}</Tag>}
                 {library.reservable && <Tag>{"\uD83D\uDCDD \uC608\uC57D"}</Tag>}
                 {library.wifi && <Tag>{"\uD83D\uDCF6 \uC640\uC774\uD30C\uC774"}</Tag>}
