@@ -32,8 +32,15 @@ export function BorderBeam({
         ["--border-width" as string]: `${borderWidth}px`,
       }}
     >
-      <div className="absolute inset-[var(--border-width)] rounded-[inherit] [mask-composite:exclude] [mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)]">
-        <div className="absolute -inset-[var(--border-width)] animate-[border-beam_var(--duration)_linear_var(--delay)_infinite] [background:linear-gradient(to_left,var(--color-from),var(--color-to),transparent)] [width:var(--size)] [offset-path:rect(0_auto_auto_0_round_calc(var(--size)))]" />
+      <div className="absolute inset-0 rounded-[inherit] overflow-hidden">
+        <div 
+          className="absolute animate-[border-beam_var(--duration)_linear_var(--delay)_infinite] [offset-path:rect(0_auto_auto_0_round_calc(var(--size)))]"
+          style={{
+            width: "var(--size)",
+            height: "2px",
+            background: `linear-gradient(to left, var(--color-from), var(--color-to), transparent)`,
+          }}
+        />
       </div>
     </div>
   );
