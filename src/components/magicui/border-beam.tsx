@@ -32,13 +32,23 @@ export function BorderBeam({
         ["--border-width" as string]: `${borderWidth}px`,
       }}
     >
-      <div className="absolute inset-0 rounded-[inherit] overflow-hidden">
+      <div 
+        className="absolute inset-0 rounded-[inherit]"
+        style={{
+          mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+          maskComposite: "exclude",
+          WebkitMaskComposite: "xor",
+          padding: "var(--border-width)",
+        }}
+      >
         <div 
-          className="absolute animate-[border-beam_var(--duration)_linear_var(--delay)_infinite] [offset-path:rect(0_auto_auto_0_round_calc(var(--size)))]"
+          className="absolute animate-[border-beam_var(--duration)_linear_var(--delay)_infinite]"
           style={{
             width: "var(--size)",
-            height: "2px",
-            background: `linear-gradient(to left, var(--color-from), var(--color-to), transparent)`,
+            height: "var(--size)",
+            background: `radial-gradient(var(--color-from) 40%, var(--color-to) 60%, transparent 80%)`,
+            offsetPath: "rect(0 100% 100% 0 round 16px)",
+            offsetDistance: "0%",
           }}
         />
       </div>
