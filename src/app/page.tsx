@@ -9,7 +9,7 @@ import { AnimatedShinyText } from "@/components/magicui/animated-shiny-text";
 import { Particles } from "@/components/magicui/particles";
 
 export default function HomePage() {
-  const [radius, setRadius] = useState(5);
+  const [radius, setRadius] = useState(30);
   const [sortBy, setSortBy] = useState<"distance" | "seats">("distance");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [userPos, setUserPos] = useState<[number, number]>([36.5, 127.5]);
@@ -18,12 +18,41 @@ export default function HomePage() {
   const markerLayerRef = useRef<any>(null);
   const userMarkerRef = useRef<any>(null);
 
+  // Haversine formula to calculate distance between two coordinates
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  const getDistanceText = (distance: number): string => {
+    if (distance < 1) return `도보 ${Math.round(distance * 15)}분`;
+    if (distance < 5) return `도보 ${Math.round(distance * 15)}분`;
+    if (distance < 20) return `버스 ${Math.round(distance * 3)}분`;
+    if (distance < 100) return `전철 ${Math.round(distance * 1.5)}분`;
+    if (distance < 300) return `KTX ${Math.round(distance / 2.5)}분`;
+    return `${Math.round(distance)}km`;
+  };
+
   const sorted = useMemo(() => {
-    const list = [...mockLibraries].filter((l) => l.distance <= radius);
+    const list = mockLibraries.map((lib) => {
+      const distance = calculateDistance(userPos[0], userPos[1], lib.lat, lib.lng);
+      return {
+        ...lib,
+        distance,
+        distanceText: getDistanceText(distance),
+      };
+    }).filter((l) => l.distance <= radius);
+    
     if (sortBy === "seats") list.sort((a, b) => b.totalAvailable - a.totalAvailable);
     else list.sort((a, b) => a.distance - b.distance);
     return list;
-  }, [radius, sortBy]);
+  }, [radius, sortBy, userPos]);
 
   const requestGeolocation = () => {
     if ("geolocation" in navigator) {
@@ -126,7 +155,7 @@ export default function HomePage() {
 
         {/* Radius filter - Magic UI style */}
         <div className="absolute top-4 left-4 flex gap-2 z-[1000] animate-fade-in">
-          {[1, 3, 5, 10].map((r, idx) => (
+          {[5, 10, 30, 100].map((r, idx) => (
             <button
               key={r}
               onClick={() => setRadius(r)}
