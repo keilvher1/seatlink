@@ -305,8 +305,90 @@ export const mockLibraries: LibraryWithDistance[] = [
     todayVisitors: 265, seatUsageRate: 55, congestionLevel: "보통",
     rooms: [
       { name: "종합열람실", totalSeats: 120, usedSeats: 66, availableSeats: 54, congestionLevel: "보통", congestionPercent: 55, lastUpdated: "2분 전" },
+      { name: "노트북열람실", totalSeats: 40, usedSeats: 15, availableSeats: 25, congestionLevel: "여유", congestionPercent: 38, lastUpdated: "3분 전" },
     ],
-    totalSeats: 120, totalUsed: 66, totalAvailable: 54, distance: 270.0, distanceText: "KTX+버스 2시간 30분", travelMinutes: 150,
+    totalSeats: 160, totalUsed: 81, totalAvailable: 79, distance: 270.0, distanceText: "KTX+버스 2시간 30분", travelMinutes: 150,
+  },
+  {
+    id: "lib-141", name: "포항시립북구도서관", address: "경북 포항시 북구 중흥로 265",
+    lat: 36.0450, lng: 129.3650, phone: "054-270-2800",
+    operatingHours: { weekday: "09:00~21:00", saturday: "09:00~17:00", holiday: "휴관" },
+    nightOperation: true, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 198, seatUsageRate: 42, congestionLevel: "여유",
+    rooms: [
+      { name: "종합열람실", totalSeats: 100, usedSeats: 42, availableSeats: 58, congestionLevel: "여유", congestionPercent: 42, lastUpdated: "1분 전" },
+      { name: "디지털자료실", totalSeats: 30, usedSeats: 8, availableSeats: 22, congestionLevel: "여유", congestionPercent: 27, lastUpdated: "2분 전" },
+    ],
+    totalSeats: 130, totalUsed: 50, totalAvailable: 80, distance: 3.5, distanceText: "버스 15분", travelMinutes: 15,
+  },
+  {
+    id: "lib-142", name: "포항공과대학교 도서관", address: "경북 포항시 남구 청암로 77",
+    lat: 36.0140, lng: 129.3260, phone: "054-279-2114",
+    operatingHours: { weekday: "08:00~24:00", saturday: "09:00~22:00", holiday: "09:00~18:00" },
+    nightOperation: true, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 520, seatUsageRate: 78, congestionLevel: "보통",
+    rooms: [
+      { name: "1열람실", totalSeats: 200, usedSeats: 156, availableSeats: 44, congestionLevel: "보통", congestionPercent: 78, lastUpdated: "1분 전" },
+      { name: "2열람실", totalSeats: 150, usedSeats: 105, availableSeats: 45, congestionLevel: "보통", congestionPercent: 70, lastUpdated: "2분 전" },
+      { name: "노트북존", totalSeats: 80, usedSeats: 48, availableSeats: 32, congestionLevel: "보통", congestionPercent: 60, lastUpdated: "1분 전" },
+    ],
+    totalSeats: 430, totalUsed: 309, totalAvailable: 121, distance: 4.2, distanceText: "버스 20분", travelMinutes: 20,
+  },
+  {
+    id: "lib-143", name: "포항시립연일도서관", address: "경북 포항시 남구 연일읍 동해대로 1385",
+    lat: 35.9920, lng: 129.3510, phone: "054-270-2850",
+    operatingHours: { weekday: "09:00~21:00", saturday: "09:00~17:00", holiday: "휴관" },
+    nightOperation: true, accessible: true, reservable: false, wifi: true, parking: true,
+    todayVisitors: 145, seatUsageRate: 35, congestionLevel: "여유",
+    rooms: [
+      { name: "종합열람실", totalSeats: 80, usedSeats: 28, availableSeats: 52, congestionLevel: "여유", congestionPercent: 35, lastUpdated: "3분 전" },
+    ],
+    totalSeats: 80, totalUsed: 28, totalAvailable: 52, distance: 5.8, distanceText: "버스 25분", travelMinutes: 25,
+  },
+  {
+    id: "lib-144", name: "포항시립오천도서관", address: "경북 포항시 남구 오천읍 원리길 20",
+    lat: 35.9780, lng: 129.3820, phone: "054-270-2860",
+    operatingHours: { weekday: "09:00~18:00", saturday: "09:00~17:00", holiday: "휴관" },
+    nightOperation: false, accessible: true, reservable: false, wifi: true, parking: true,
+    todayVisitors: 98, seatUsageRate: 28, congestionLevel: "여유",
+    rooms: [
+      { name: "종합열람실", totalSeats: 60, usedSeats: 17, availableSeats: 43, congestionLevel: "여유", congestionPercent: 28, lastUpdated: "5분 전" },
+    ],
+    totalSeats: 60, totalUsed: 17, totalAvailable: 43, distance: 7.2, distanceText: "버스 30분", travelMinutes: 30,
+  },
+  {
+    id: "lib-145", name: "경주시립중앙도서관", address: "경북 경주시 태종로 563",
+    lat: 35.8562, lng: 129.2247, phone: "054-779-6100",
+    operatingHours: { weekday: "09:00~22:00", saturday: "09:00~18:00", holiday: "09:00~17:00" },
+    nightOperation: true, accessible: true, reservable: true, wifi: true, parking: true,
+    todayVisitors: 312, seatUsageRate: 58, congestionLevel: "보통",
+    rooms: [
+      { name: "종합열람실", totalSeats: 150, usedSeats: 87, availableSeats: 63, congestionLevel: "보통", congestionPercent: 58, lastUpdated: "2분 전" },
+      { name: "수험생열람실", totalSeats: 80, usedSeats: 62, availableSeats: 18, congestionLevel: "혼잡", congestionPercent: 78, lastUpdated: "1분 전" },
+    ],
+    totalSeats: 230, totalUsed: 149, totalAvailable: 81, distance: 22.5, distanceText: "버스 40분", travelMinutes: 40,
+  },
+  {
+    id: "lib-146", name: "영덕군립도서관", address: "경북 영덕군 영덕읍 덕곡리 1",
+    lat: 36.4153, lng: 129.3656, phone: "054-730-6640",
+    operatingHours: { weekday: "09:00~18:00", saturday: "09:00~17:00", holiday: "휴관" },
+    nightOperation: false, accessible: true, reservable: false, wifi: true, parking: true,
+    todayVisitors: 67, seatUsageRate: 22, congestionLevel: "여유",
+    rooms: [
+      { name: "종합열람실", totalSeats: 50, usedSeats: 11, availableSeats: 39, congestionLevel: "여유", congestionPercent: 22, lastUpdated: "8분 전" },
+    ],
+    totalSeats: 50, totalUsed: 11, totalAvailable: 39, distance: 45.0, distanceText: "버스 1시간", travelMinutes: 60,
+  },
+  {
+    id: "lib-147", name: "울진군립도서관", address: "경북 울진군 울진읍 읍내리",
+    lat: 36.9930, lng: 129.4003, phone: "054-789-5100",
+    operatingHours: { weekday: "09:00~18:00", saturday: "09:00~17:00", holiday: "휴관" },
+    nightOperation: false, accessible: true, reservable: false, wifi: true, parking: true,
+    todayVisitors: 55, seatUsageRate: 18, congestionLevel: "여유",
+    rooms: [
+      { name: "종합열람실", totalSeats: 40, usedSeats: 7, availableSeats: 33, congestionLevel: "여유", congestionPercent: 18, lastUpdated: "10분 전" },
+    ],
+    totalSeats: 40, totalUsed: 7, totalAvailable: 33, distance: 85.0, distanceText: "버스 1시간 40분", travelMinutes: 100,
   },
 
   // ===== 경상남도 =====
