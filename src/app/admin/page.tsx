@@ -251,7 +251,7 @@ export default function AdminPage() {
                 { rule: "\uD63C\uC7A1\uB3C4 90% \uC774\uC0C1 \uC2DC \uACBD\uACE0", enabled: true, type: "warning" },
                 { rule: "API \uC5F0\uACB0 \uB04A\uAE40 \uC2DC \uC54C\uB9BC", enabled: true, type: "error" },
                 { rule: "\uC2E0\uADDC \uB3C4\uC11C\uAD00 \uC5F0\uB3D9 \uC644\uB8CC \uC2DC \uC54C\uB9BC", enabled: true, type: "success" },
-                { rule: "\uC8FC\uAC04 \uBCF4\uACE0\uC11C \uC0DD\uC131 \uC644\uB8CC \uC2DC \uC54C\uB9BC", enabledalse, type: "info" },
+                { rule: "\uC8FC\uAC04 \uBCF4\uACE0\uC11C \uC0DD\uC131 \uC644\uB8CC \uC2DC \uC54C\uB9BC", enabled: false, type: "info" },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between glass-subtle rounded-xl px-4 py-3">
                   <div className="flex items-center gap-3">
