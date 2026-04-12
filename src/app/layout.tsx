@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
+import { AnimatedGradientText } from "@/components/magicui/animated-gradient-text";
 
 export const metadata: Metadata = {
   title: "좌석이음 SeatLink — 전국 도서관 실시간 좌석 · AI 추천",
@@ -46,13 +47,15 @@ function Header() {
     <header className="sticky top-0 z-40 glass">
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-4">
         {/* 로고 */}
-        <a href="/" className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/30">
+        <a href="/" className="flex items-center gap-2 shrink-0 group">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 group-hover:scale-110 transition-all duration-300">
             <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth={2.5}>
               <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
-          <span className="font-bold text-lg gradient-text">좌석이음</span>
+          <span className="font-bold text-lg">
+            <AnimatedGradientText>좌석이음</AnimatedGradientText>
+          </span>
         </a>
 
         {/* 검색바 */}

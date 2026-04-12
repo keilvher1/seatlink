@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { mockReviews, mockStudyGroups } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
+import { MagicCard } from "@/components/magicui/magic-card";
+import { AnimatedGradientText } from "@/components/magicui/animated-gradient-text";
+import { Particles } from "@/components/magicui/particles";
+import { ShimmerButton } from "@/components/magicui/shimmer-button";
 
 const TABS = ["💬 한줄 후기", "⭐ 도서관 리뷰", "📚 스터디 매칭"] as const;
 
@@ -10,11 +14,16 @@ export default function CommunityPage() {
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]>("💬 한줄 후기");
 
   return (
-    <div className="max-w-2xl mx-auto pb-24 md:pb-0">
+    <div className="max-w-2xl mx-auto pb-24 md:pb-0 relative">
+      {/* Background Particles */}
+      <Particles className="absolute inset-0 -z-10" quantity={25} color="#6366f1" size={0.6} speed={0.15} />
+      
       {/* 헤더 */}
-      <div className="px-4 py-6 text-center border-b border-slate-200/50 bg-gradient-to-b from-blue-50 to-transparent">
-        <h1 className="text-3xl font-bold gradient-text">커뮤니티</h1>
-        <p className="text-sm text-slate-500 mt-2">도서관 이용자들과 경험을 나누어보세요</p>
+      <div className="px-4 py-6 text-center border-b border-slate-200/50 bg-gradient-to-b from-blue-50 to-transparent relative">
+        <h1 className="text-3xl font-bold">
+          <AnimatedGradientText>{"커뮤니티"}</AnimatedGradientText>
+        </h1>
+        <p className="text-sm text-slate-500 mt-2">{"도서관 이용자들과 경험을 나누어보세요"}</p>
       </div>
 
       {/* 탭 */}
@@ -50,13 +59,14 @@ export default function CommunityPage() {
 // 한줄 후기 탭
 // ========================
 function ShortReviewTab() {
-  const moods = ["😊 좋아요", "😐 보통", "😰 복잡해요", "🤫 조용해요", "💪 집중 잘 돼요"];
+  const moods = ["좋아요", "보통", "복잡해요", "조용해요", "집중 잘 돼요"];
+  const moodEmojis = ["😊", "😐", "😰", "🤫", "💪"];
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
 
   return (
     <div className="space-y-4 animate-slide-up">
       {/* 작성 영역 */}
-      <div className="glass rounded-2xl p-5">
+      <MagicCard className="glass rounded-2xl p-5" gradientColor="rgba(59,130,246,0.08)">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-md">
             나
@@ -68,7 +78,7 @@ function ShortReviewTab() {
               rows={2}
             />
             <div className="flex flex-wrap gap-1.5 mt-3">
-              {moods.map((mood) => (
+              {moods.map((mood, idx) => (
                 <button
                   key={mood}
                   onClick={() => setSelectedMood(selectedMood === mood ? null : mood)}
@@ -79,22 +89,26 @@ function ShortReviewTab() {
                       : "glass text-slate-700 hover:scale-105"
                   )}
                 >
-                  {mood}
+                  {moodEmojis[idx]} {mood}
                 </button>
               ))}
             </div>
             <div className="flex justify-end mt-4">
-              <button className="px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all transform hover:scale-105">
-                게시하기
-              </button>
+              <ShimmerButton
+                className="px-5 py-2 text-sm font-bold"
+                shimmerColor="rgba(255,255,255,0.2)"
+                background="linear-gradient(110deg, #2563eb, #4f46e5, #2563eb)"
+              >
+                {"게시하기"}
+              </ShimmerButton>
             </div>
           </div>
         </div>
-      </div>
+      </MagicCard>
 
       {/* 피드 */}
       {mockReviews.map((review, idx) => (
-        <div key={review.id} className="glass rounded-2xl p-4 hover:shadow-lg transition-all duration-300 animate-slide-up" style={{ animationDelay: `${idx * 50}ms` }}>
+        <MagicCard key={review.id} className="glass rounded-2xl p-4 hover:shadow-lg transition-all duration-300 animate-slide-up" style={{ animationDelay: `${idx * 50}ms` }} gradientColor="rgba(59,130,246,0.06)">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md">
               {review.userName[0]}
@@ -110,11 +124,11 @@ function ShortReviewTab() {
           </div>
           <p className="text-sm text-slate-700 leading-relaxed font-medium">{review.content}</p>
           <div className="flex items-center gap-4 mt-3 text-xs text-slate-600">
-            <button className="flex items-center gap-1 hover:text-blue-600 font-medium transition">👍 {review.helpful}</button>
-            <button className="flex items-center gap-1 hover:text-blue-600 font-medium transition">💬 {review.comments}</button>
-            <button className="flex items-center gap-1 hover:text-blue-600 font-medium transition">📌 저장</button>
+            <button className="flex items-center gap-1 hover:text-blue-600 font-medium transition">{"👍"} {review.helpful}</button>
+            <button className="flex items-center gap-1 hover:text-blue-600 font-medium transition">{"💬"} {review.comments}</button>
+            <button className="flex items-center gap-1 hover:text-blue-600 font-medium transition">{"📌 저장"}</button>
           </div>
-        </div>
+        </MagicCard>
       ))}
     </div>
   );
@@ -216,12 +230,16 @@ function DetailReviewTab() {
 function StudyMatchTab() {
   return (
     <div className="space-y-4 animate-slide-up">
-      <button className="w-full py-4 border-2 border-dashed border-blue-400 text-blue-600 font-bold rounded-2xl hover:bg-blue-50/50 hover:border-blue-500 transition-all transform hover:scale-105 text-lg">
-        📚 스터디 그룹 만들기
-      </button>
+      <ShimmerButton
+        className="w-full py-4 text-lg font-bold"
+        shimmerColor="rgba(255,255,255,0.2)"
+        background="linear-gradient(110deg, #2563eb, #4f46e5, #2563eb)"
+      >
+        {"📚 스터디 그룹 만들기"}
+      </ShimmerButton>
 
       {mockStudyGroups.map((group, idx) => (
-        <div key={group.id} className="glass rounded-2xl p-5 hover:shadow-lg transition-all duration-300 animate-slide-up" style={{ animationDelay: `${idx * 50}ms` }}>
+        <MagicCard key={group.id} className="glass rounded-2xl p-5 hover:shadow-lg transition-all duration-300 animate-slide-up" style={{ animationDelay: `${idx * 50}ms` }} gradientColor="rgba(59,130,246,0.06)">
           <h3 className="font-bold text-slate-900 text-lg mb-3">{group.title}</h3>
           <div className="space-y-2 text-sm text-slate-700 mb-3 font-medium">
             <p>📍 {group.libraryName} {group.location}</p>
@@ -235,14 +253,18 @@ function StudyMatchTab() {
             ))}
           </div>
           <div className="flex gap-2">
-            <button className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all transform hover:scale-105">
-              참여 신청하기
-            </button>
+            <ShimmerButton
+              className="flex-1 py-3 text-sm font-bold"
+              shimmerColor="rgba(255,255,255,0.2)"
+              background="linear-gradient(110deg, #2563eb, #4f46e5, #2563eb)"
+            >
+              {"참여 신청하기"}
+            </ShimmerButton>
             <button className="px-4 py-3 glass rounded-xl text-slate-700 text-sm font-semibold hover:shadow-md transition">
-              상세보기
+              {"상세보기"}
             </button>
           </div>
-        </div>
+        </MagicCard>
       ))}
     </div>
   );
