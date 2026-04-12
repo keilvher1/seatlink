@@ -33,7 +33,7 @@ export async function fetchPublicAPI<T = any>(
   baseUrl: string,
   endpoint: string,
   options: FetchOptions = {}
-): Promise<{ items: T[]; totalCount: number }> {
+): Promise<{ items: T[]; totalCount: number; error?: string }> {
   const apiKey = process.env.DATA_GO_KR_API_KEY;
 
   if (!apiKey) {
@@ -81,26 +81,26 @@ export async function fetchPublicAPI<T = any>(
         || text.match(/<resultMsg>(.*?)<\/resultMsg>/)?.[1]
         || "Unknown XML error";
       console.error(`[API] Error message: ${errMsg}`);
-      return { items: [], totalCount: 0 };
+      return { items: [], totalCount: 0, error: errMsg };
     }
 
     if (!res.ok) {
       console.error(`[API] HTTP Error: ${res.status} ${res.statusText}`);
-      return { items: [], totalCount: 0 };
+      return { items: [], totalCount: 0, error: `HTTP ${res.status}` };
     }
 
     let data: any;
     try {
       data = JSON.parse(text);
     } catch (e) {
-      console.error(`[API] JSON parse failed for ${endpoint}:`, text.substring(0, 200));
-      return { items: [], totalCount: 0 };
+      console.error(`[API] JSON parse failed for ${endpoint}`);
+      return { items: [], totalCount: 0, error: "JSON parse failed" };
     }
 
     const header = data?.response?.header;
     if (header && header.resultCode && header.resultCode !== "00" && header.resultCode !== "0000") {
-      console.error(`[API] API Error: code=${header.resultCode}, msg=${header.resultMsg || "unknown"}`);
-      return { items: [], totalCount: 0 };
+      console.error(`[API] API Error: code=${header.resultCode}`);
+      return { items: [], totalCount: 0, error: `API code ${header.resultCode}` };
     }
 
     const body = data?.response?.body;
@@ -133,10 +133,11 @@ export async function fetchPublicAPI<T = any>(
   } catch (error: any) {
     if (error.name === "AbortError") {
       console.error(`[API] Timeout for ${endpoint} (15s)`);
+      return { items: [], totalCount: 0, error: "Timeout 15s" };
     } else {
       console.error(`[API] Failed to fetch ${endpoint}:`, error.message || error);
     }
-    return { items: [], totalCount: 0 };
+    return { items: [], totalCount: 0, error: error.message || "Unknown error" };
   }
 }
 
