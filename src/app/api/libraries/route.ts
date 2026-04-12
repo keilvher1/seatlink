@@ -12,10 +12,10 @@ export async function GET(request: NextRequest) {
   if (!process.env.DATA_GO_KR_API_KEY) {
     console.log("[Libraries] No API key configured");
     return NextResponse.json({
-      libraries: [],
-      totalCount: 0,
+      libraries: getMockLibraries(),
+      totalCount: getMockLibraries().length,
       updatedAt: new Date().toISOString(),
-      source: "no-api-key",
+      source: "no-api-key-fallback",
     });
   }
 
@@ -40,12 +40,12 @@ export async function GET(request: NextRequest) {
 
     // íëë ë°ì´í°ê° ìì¼ë©´ ë¹ ë°°ì´ ë°í
     if (info.items.length === 0 && status.items.length === 0 && realtime.items.length === 0) {
-      console.warn("[Libraries] All APIs returned empty");
+      console.warn("[Libraries] All APIs returned empty, using fallback mock data");
       return NextResponse.json({
-        libraries: [],
-        totalCount: 0,
+        libraries: getMockLibraries(),
+        totalCount: getMockLibraries().length,
         updatedAt: new Date().toISOString(),
-        source: "api-empty",
+        source: "mock-fallback",
         debug: {
           infoStatus: infoRes.status,
           statusStatus: statusRes.status,
@@ -247,11 +247,159 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     console.error("[Libraries] Fatal error:", error.message || error);
     return NextResponse.json({
-      libraries: [],
-      totalCount: 0,
+      libraries: getMockLibraries(),
+      totalCount: getMockLibraries().length,
       updatedAt: new Date().toISOString(),
-      source: "error",
+      source: "error-fallback",
       error: error.message,
     });
   }
+}
+
+
+function getMockLibraries() {
+  const now = new Date().toISOString();
+  return [
+    {
+      id: "mock_pohang_1",
+      name: "Pohang City Library",
+      address: "Gyeongsangbuk-do Pohang-si Nam-gu Hyoja-dong 233-1",
+      lat: 36.0190,
+      lng: 129.3435,
+      phone: "054-270-4301",
+      operatingHours: { weekday: "09:00~22:00", saturday: "09:00~17:00", holiday: "Closed" },
+      nightOperation: true,
+      accessible: true,
+      reservable: true,
+      wifi: true,
+      parking: true,
+      todayVisitors: 342,
+      seatUsageRate: 62,
+      congestionLevel: "moderate",
+      rooms: [
+        { name: "General Reading Room", totalSeats: 200, usedSeats: 124, availableSeats: 76, congestionPercent: 62, congestionLevel: "moderate", lastUpdated: now },
+        { name: "Digital Materials Room", totalSeats: 50, usedSeats: 31, availableSeats: 19, congestionPercent: 62, congestionLevel: "moderate", lastUpdated: now },
+      ],
+      totalSeats: 250,
+      totalUsed: 155,
+      totalAvailable: 95,
+    },
+    {
+      id: "mock_pohang_2",
+      name: "POSTECH Library",
+      address: "Gyeongsangbuk-do Pohang-si Nam-gu Cheongam-ro 77",
+      lat: 36.0110,
+      lng: 129.3230,
+      phone: "054-279-2548",
+      operatingHours: { weekday: "08:00~23:00", saturday: "09:00~22:00", holiday: "09:00~17:00" },
+      nightOperation: true,
+      accessible: true,
+      reservable: true,
+      wifi: true,
+      parking: true,
+      todayVisitors: 521,
+      seatUsageRate: 78,
+      congestionLevel: "crowded",
+      rooms: [
+        { name: "Main Reading Room", totalSeats: 300, usedSeats: 234, availableSeats: 66, congestionPercent: 78, congestionLevel: "crowded", lastUpdated: now },
+        { name: "Group Study Room", totalSeats: 40, usedSeats: 28, availableSeats: 12, congestionPercent: 70, congestionLevel: "moderate", lastUpdated: now },
+      ],
+      totalSeats: 340,
+      totalUsed: 262,
+      totalAvailable: 78,
+    },
+    {
+      id: "mock_pohang_3",
+      name: "Handong Global Univ Library",
+      address: "Gyeongsangbuk-do Pohang-si Buk-gu Heunghae-eup 558",
+      lat: 36.1033,
+      lng: 129.3889,
+      phone: "054-260-1414",
+      operatingHours: { weekday: "08:00~22:00", saturday: "09:00~18:00", holiday: "Closed" },
+      nightOperation: true,
+      accessible: true,
+      reservable: false,
+      wifi: true,
+      parking: true,
+      todayVisitors: 287,
+      seatUsageRate: 45,
+      congestionLevel: "moderate",
+      rooms: [
+        { name: "Reading Room 1F", totalSeats: 150, usedSeats: 68, availableSeats: 82, congestionPercent: 45, congestionLevel: "moderate", lastUpdated: now },
+      ],
+      totalSeats: 150,
+      totalUsed: 68,
+      totalAvailable: 82,
+    },
+    {
+      id: "mock_pohang_4",
+      name: "Oecheon Public Library",
+      address: "Gyeongsangbuk-do Pohang-si Nam-gu Oecheon-eup 345",
+      lat: 35.9834,
+      lng: 129.3650,
+      phone: "054-270-4400",
+      operatingHours: { weekday: "09:00~18:00", saturday: "09:00~17:00", holiday: "Closed" },
+      nightOperation: false,
+      accessible: true,
+      reservable: false,
+      wifi: true,
+      parking: true,
+      todayVisitors: 89,
+      seatUsageRate: 25,
+      congestionLevel: "relaxed",
+      rooms: [
+        { name: "Reading Room", totalSeats: 80, usedSeats: 20, availableSeats: 60, congestionPercent: 25, congestionLevel: "relaxed", lastUpdated: now },
+      ],
+      totalSeats: 80,
+      totalUsed: 20,
+      totalAvailable: 60,
+    },
+    {
+      id: "mock_pohang_5",
+      name: "Jangseong Public Library",
+      address: "Gyeongsangbuk-do Pohang-si Buk-gu Jangseong-dong 120",
+      lat: 36.0450,
+      lng: 129.3700,
+      phone: "054-270-4500",
+      operatingHours: { weekday: "09:00~21:00", saturday: "09:00~17:00", holiday: "Closed" },
+      nightOperation: true,
+      accessible: true,
+      reservable: true,
+      wifi: true,
+      parking: false,
+      todayVisitors: 156,
+      seatUsageRate: 55,
+      congestionLevel: "moderate",
+      rooms: [
+        { name: "General Reading Room", totalSeats: 120, usedSeats: 66, availableSeats: 54, congestionPercent: 55, congestionLevel: "moderate", lastUpdated: now },
+        { name: "Quiet Study Room", totalSeats: 30, usedSeats: 18, availableSeats: 12, congestionPercent: 60, congestionLevel: "moderate", lastUpdated: now },
+      ],
+      totalSeats: 150,
+      totalUsed: 84,
+      totalAvailable: 66,
+    },
+    {
+      id: "mock_pohang_6",
+      name: "Heunghae Public Library",
+      address: "Gyeongsangbuk-do Pohang-si Buk-gu Heunghae-eup 210",
+      lat: 36.0980,
+      lng: 129.3500,
+      phone: "054-270-4600",
+      operatingHours: { weekday: "09:00~18:00", saturday: "09:00~13:00", holiday: "Closed" },
+      nightOperation: false,
+      accessible: true,
+      reservable: false,
+      wifi: true,
+      parking: true,
+      todayVisitors: 64,
+      seatUsageRate: 18,
+      congestionLevel: "relaxed",
+      rooms: [
+        { name: "Reading Room", totalSeats: 60, usedSeats: 11, availableSeats: 49, congestionPercent: 18, congestionLevel: "relaxed", lastUpdated: now },
+      ],
+      totalSeats: 60,
+      totalUsed: 11,
+      totalAvailable: 49,
+    },
+  ];
 }
