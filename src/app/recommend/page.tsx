@@ -31,11 +31,11 @@ export default function RecommendPage() {
         const data = await res.json();
         const libs = data.libraries || [];
         setLibraries(libs);
-        const scored = libs.map((lib) => ({
+        const scored = libs.map((lib: any) => ({
           ...lib,
           score: Math.round(Math.random() * 40 + 60),
         }));
-        setRecommendations(scored.sort((a, b) => b.score - a.score));
+        setRecommendations(scored.sort((a: any, b: any) => b.score - a.score));
       } catch (err) {
         console.error("Failed to fetch libraries:", err);
       } finally {
