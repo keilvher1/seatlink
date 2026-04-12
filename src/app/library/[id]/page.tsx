@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
-import { mockLibraries, mockPrediction, mockWeeklyHeatmap, mockBikeStations, mockBuses, mockAccessibleTransport, mockReviews } from "@/lib/mock-data";
 import { getCongestionColor, getCongestionHex, cn } from "@/lib/utils";
 import { MagicCard } from "@/components/magicui/magic-card";
 import { BorderBeam } from "@/components/magicui/border-beam";
@@ -18,12 +17,52 @@ export default function LibraryDetailPage() {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]>("\uC5F4\uB78C\uC2E4 \uD604\uD669");
   const [isFav, setIsFav] = useState(false);
+  const [library, setLibrary] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const library = mockLibraries.find((l) => l.id === id) || mockLibraries[0];
+  useEffect(() => {
+    const fetchLibrary = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch("/api/libraries");
+        const data = await res.json();
+        const libs = data.libraries || [];
+        const found = libs.find((l: any) => l.id === id);
+        setLibrary(found || libs[0] || null);
+      } catch (err) {
+        console.error("Failed to fetch library:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLibrary();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="max-w-2xl mx-auto min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-slate-600 font-medium">{"\uB3C4\uC11C\uAD00 \uC815\uBCF4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911..."}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!library) {
+    return (
+      <div className="max-w-2xl mx-auto min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-slate-600 font-medium">{"\uB3C4\uC11C\uAD00 \uC815\uBCF4\uB97C \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4."}</p>
+          <a href="/" className="text-blue-600 mt-2 inline-block font-medium">{"\uD648\uC73C\uB85C \uB3CC\uC544\uAC00\uAE30"}</a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto min-h-screen pb-24 md:pb-0">
-      {/* ìë¨ ë¤ë¹ */}
+      {/* \uC0C1\uB2E8 \uB124\uBE44 */}
       <div className="sticky top-14 z-40 glass">
         <div className="flex items-center justify-between px-4 py-3">
           <a href="/" className="flex items-center gap-1 text-blue-600 hover:text-blue-700 transition font-medium">
@@ -41,12 +80,12 @@ export default function LibraryDetailPage() {
         </div>
       </div>
 
-      {/* ëìê´ ì ë³´ ì¹´ë */}
+      {/* \uB3C4\uC11C\uAD00 \uC815\uBCF4 \uCE74\uB4DC */}
       <MagicCard className="glass-subtle m-4 rounded-2xl" gradientColor="rgba(37,99,235,0.06)">
         <div className="px-4 py-5 space-y-3 relative">
           <BorderBeam size={200} duration={16} colorFrom="#2563eb" colorTo="#a855f7" />
           <p className="text-sm text-slate-700 font-medium">{"\uD83D\uDCCD"} {library.address}</p>
-          <p className="text-sm text-slate-700 font-medium">{"\uD83D\uDD50"} {library.operatingHours.weekday}
+          <p className="text-sm text-slate-700 font-medium">{"\uD83D\uDD50"} {library.operatingHours?.weekday || "N/A"}
             {library.nightOperation && <span className="ml-2 px-2.5 py-0.5 badge-success text-xs">{"\uD83C\uDF19 \uC57C\uAC04\uC6B4\uC601"}</span>}
           </p>
           <p className="text-sm text-slate-700 font-medium">{"\u260E\uFE0F"} {library.phone}</p>
@@ -62,7 +101,7 @@ export default function LibraryDetailPage() {
         </div>
       </MagicCard>
 
-      {/* í­ */}
+      {/* \uD0ED */}
       <div className="sticky top-[104px] z-30 glass mx-4 rounded-t-2xl flex mt-4">
         {TABS.map((tab) => (
           <button
@@ -80,7 +119,7 @@ export default function LibraryDetailPage() {
         ))}
       </div>
 
-      {/* í­ ì½íì¸  */}
+      {/* \uD0ED \uCF58\uD150\uCE20 */}
       <div className="px-4 py-4">
         {activeTab === "\uC5F4\uB78C\uC2E4 \uD604\uD669" && <RoomStatusTab library={library} />}
         {activeTab === "AI \uC608\uCE21" && <PredictionTab />}
@@ -91,12 +130,25 @@ export default function LibraryDetailPage() {
   );
 }
 
-function RoomStatusTab({ library }: { library: typeof mockLibraries[0] }) {
-  const totalPercent = Math.round((library.totalUsed / library.totalSeats) * 100);
+function RoomStatusTab({ library }: { library: any }) {
+  const totalSeats = library.totalSeats || 1;
+  const totalPercent = Math.round(((library.totalUsed || 0) / totalSeats) * 100);
+  const rooms = library.rooms || [];
+
+  if (rooms.length === 0) {
+    return (
+      <div className="space-y-4 animate-fade-up">
+        <MagicCard className="glass rounded-2xl p-6 text-center" gradientColor="rgba(37,99,235,0.05)">
+          <p className="text-slate-600 font-medium">{"\uC5F4\uB78C\uC2E4 \uC2E4\uC2DC\uAC04 \uB370\uC774\uD130\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4."}</p>
+          <p className="text-sm text-slate-500 mt-1">{"\uCD1D \uC88C\uC11D: "}{library.totalSeats || 0}{"\uC11D"}</p>
+        </MagicCard>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 animate-fade-up">
-      {library.rooms.map((room, idx) => {
+      {rooms.map((room: any, idx: number) => {
         const color = getCongestionColor(room.congestionLevel);
         return (
           <MagicCard key={room.name} className="glass rounded-2xl" gradientColor="rgba(37,99,235,0.05)">
@@ -123,7 +175,7 @@ function RoomStatusTab({ library }: { library: typeof mockLibraries[0] }) {
         );
       })}
 
-      {/* ì ì²´ ìì½ */}
+      {/* \uC804\uCCB4 \uC694\uC57D */}
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 text-white shadow-xl shadow-slate-900/30 relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <h3 className="font-bold text-lg mb-4 relative z-10">{"\uD83D\uDCCA"} {"\uC804\uCCB4 \uC88C\uC11D \uD604\uD669"}</h3>
@@ -161,70 +213,14 @@ function RoomStatusTab({ library }: { library: typeof mockLibraries[0] }) {
 function PredictionTab() {
   return (
     <div className="space-y-6 animate-fade-up">
-      <div>
-        <h3 className="font-bold text-slate-900 mb-4">{"\uD83D\uDCCA AI \uD63C\uC7A1\uB3C4 \uC608\uCE21 (\uC624\uB298)"}</h3>
-        <MagicCard className="glass rounded-2xl p-4" gradientColor="rgba(37,99,235,0.06)">
-          <ResponsiveContainer width="100%" height={240}>
-            <AreaChart data={mockPrediction} margin={{ top: 10, right: 10, bottom: 10, left: -20 }}>
-              <defs>
-                <linearGradient id="congestionGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(100,116,139,0.1)" />
-              <XAxis dataKey="hour" tick={{ fontSize: 11 }} tickLine={false} stroke="#94a3b8" />
-              <YAxis tick={{ fontSize: 11 }} tickLine={false} domain={[0, 100]} tickFormatter={(v) => `${v}%`} stroke="#94a3b8" />
-              <Tooltip formatter={(value: number) => [`${value}%`, "\uD63C\uC7A1\uB3C4"]} contentStyle={{ borderRadius: 16, border: "1px solid rgba(100,116,139,0.2)", backgroundColor: "rgba(255,255,255,0.95)", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }} />
-              <ReferenceLine x="13:00" stroke="#2563eb" strokeDasharray="5 5" strokeWidth={2} label={{ value: "\uD604\uC7AC", fill: "#2563eb", fontSize: 11, offset: 10 }} />
-              <Area type="monotone" dataKey="congestion" stroke="#3b82f6" strokeWidth={3} fill="url(#congestionGradient)" dot={(props: any) => { const { cx, cy, payload } = props; return (<circle key={payload.hour} cx={cx} cy={cy} r={4} fill={getCongestionHex(payload.congestion)} stroke="white" strokeWidth={2} className="shadow-md" />); }} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </MagicCard>
-      </div>
-
-      <MagicCard className="glass rounded-2xl p-5 border-l-4 border-blue-600" gradientColor="rgba(37,99,235,0.06)">
-        <h4 className="font-bold text-blue-900 flex items-center gap-2 mb-2 text-lg">{"\u2728 AI \uBD84\uC11D \uC778\uC0AC\uC774\uD2B8"}</h4>
-        <p className="text-slate-700 leading-relaxed font-medium">
-          {"\uC624\uB298"} <span className="font-bold gradient-text">14:00~15:00</span> {"\uC2DC\uAC04\uB300\uAC00 \uAC00\uC7A5 \uC5EC\uC720\uB85C\uC6B8 \uAC83\uC73C\uB85C \uC608\uC0C1\uB429\uB2C8\uB2E4."}
-          {" \uD604\uC7AC \uCD94\uC138 \uAE30\uC900 \uC57D"} <span className="font-bold text-emerald-600">35{"\uC11D"}</span>{"\uC758 \uC794\uC5EC\uC88C\uC11D\uC774 \uC608\uC0C1\uB429\uB2C8\uB2E4."}
-        </p>
-        <p className="text-slate-600 mt-3 font-medium">
-          {"\uD83D\uDCA1 \uC9C0\uAE08 \uCD9C\uBC1C\uD558\uBA74 \uB3C4\uCC29 \uC608\uC0C1 \uC2DC\uC810(12\uBD84 \uD6C4) \uD63C\uC7A1\uB3C4:"}
-          <span className="inline-block ml-1 px-2.5 py-0.5 bg-amber-100 text-amber-700 text-sm font-bold rounded-full">{"58% (\uBCF4\uD1B5)"}</span>
-        </p>
+      <MagicCard className="glass rounded-2xl p-6 text-center" gradientColor="rgba(37,99,235,0.06)">
+        <div className="py-8">
+          <span className="text-5xl mb-4 block">{"\uD83D\uDCCA"}</span>
+          <h3 className="font-bold text-slate-900 mb-2 text-lg">{"AI \uD63C\uC7A1\uB3C4 \uC608\uCE21"}</h3>
+          <p className="text-slate-600 font-medium">{"\uC2E4\uC2DC\uAC04 \uB370\uC774\uD130 \uAE30\uBC18 AI \uC608\uCE21 \uC11C\uBE44\uC2A4\uB97C \uC900\uBE44 \uC911\uC785\uB2C8\uB2E4."}</p>
+          <p className="text-sm text-slate-500 mt-2">{"\uACE7 \uC2DC\uAC04\uB300\uBCC4 \uD63C\uC7A1\uB3C4 \uC608\uCE21\uACFC \uC694\uC77C\uBCC4 \uD328\uD134 \uBD84\uC11D\uC744 \uC81C\uACF5\uD560 \uC608\uC815\uC785\uB2C8\uB2E4."}</p>
+        </div>
       </MagicCard>
-
-      <div>
-        <h3 className="font-bold text-slate-900 mb-4">{"\uD83D\uDCC5 \uC694\uC77C\uBCC4 \uD63C\uC7A1\uB3C4 \uD328\uD134"}</h3>
-        <MagicCard className="glass rounded-2xl p-4 overflow-x-auto" gradientColor="rgba(37,99,235,0.04)">
-          <div className="min-w-[500px]">
-            <div className="flex items-center gap-0.5 mb-2">
-              <div className="w-8" />
-              {Array.from({ length: 17 }, (_, i) => (
-                <div key={i} className="flex-1 text-center text-[9px] text-slate-500 font-medium">
-                  {i % 2 === 0 ? `${6 + i}\uC2DC` : ""}
-                </div>
-              ))}
-            </div>
-            {mockWeeklyHeatmap.map((row) => (
-              <div key={row.day} className="flex items-center gap-0.5 mb-1">
-                <div className="w-8 text-xs text-slate-600 font-semibold">{row.day}</div>
-                {row.hours.map((val, i) => (
-                  <div key={i} className="flex-1 aspect-square rounded transition-all hover:scale-110 shadow-sm hover:shadow-md cursor-pointer" style={{ backgroundColor: getCongestionHex(val) }} title={`${row.day} ${6 + i}\uC2DC: ${val}%`} />
-                ))}
-              </div>
-            ))}
-            <div className="flex items-center justify-center gap-2 mt-4 text-[10px] text-slate-600">
-              <span className="font-medium">{"\uC5EC\uC720"}</span>
-              {[20, 40, 60, 80, 95].map((v) => (
-                <div key={v} className="w-4 h-4 rounded shadow-sm" style={{ backgroundColor: getCongestionHex(v) }} />
-              ))}
-              <span className="font-medium">{"\uD63C\uC7A1"}</span>
-            </div>
-          </div>
-        </MagicCard>
-      </div>
     </div>
   );
 }
@@ -232,122 +228,29 @@ function PredictionTab() {
 function TransportTab() {
   return (
     <div className="space-y-4 animate-fade-up">
-      <MagicCard className="glass rounded-2xl p-5 border-l-4 border-emerald-600" gradientColor="rgba(16,185,129,0.06)">
-        <h3 className="font-bold text-emerald-900 flex items-center gap-2 mb-4 text-lg">{"\uD83D\uDEB2 \uACF5\uC601\uC790\uC804\uAC70"}</h3>
-        {mockBikeStations.map((s) => (
-          <div key={s.id} className="mb-4 last:mb-0">
-            <p className="text-sm text-emerald-800 font-semibold">{s.name} ({Math.round(s.distance * 1000)}m)</p>
-            <div className="flex items-center gap-2 mt-2">
-              <div className="flex-1 h-2.5 bg-slate-200 rounded-full overflow-hidden shadow-inner">
-                <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full shadow-sm" style={{ width: `${(s.availableBikes / s.totalDocks) * 100}%` }} />
-              </div>
-              <span className="text-sm font-bold text-emerald-700 w-16 text-right">{s.availableBikes}/{s.totalDocks}{"\uB300"}</span>
-            </div>
-          </div>
-        ))}
-      </MagicCard>
-
-      <MagicCard className="glass rounded-2xl p-5 border-l-4 border-blue-600" gradientColor="rgba(37,99,235,0.06)">
-        <h3 className="font-bold text-blue-900 flex items-center gap-2 mb-4 text-lg">{"\uD83D\uDE8C \uC2DC\uB0B4\uBC84\uC2A4"}</h3>
-        <p className="text-xs text-blue-600 font-medium mb-3">{"\uC815\uB958\uC7A5: "}{mockBuses[0]?.stopName} ({Math.round((mockBuses[0]?.stopDistance || 0) * 1000)}m)</p>
-        <div className="space-y-2">
-          {mockBuses.map((bus) => (
-            <div key={bus.routeNumber} className="flex items-center justify-between glass rounded-xl px-4 py-3 hover:scale-[1.02] transition-all">
-              <div className="flex items-center gap-3">
-                <span className="px-3 py-1 bg-gradient-to-br from-blue-600 to-blue-700 text-white text-xs font-bold rounded-lg shadow-md">{bus.routeNumber}</span>
-                <span className="text-sm text-slate-700 font-medium">{bus.stopName}</span>
-              </div>
-              <span className={cn("text-sm font-bold", bus.arrivalMinutes <= 3 ? "text-emerald-600" : bus.arrivalMinutes <= 10 ? "text-amber-600" : "text-slate-500")}>
-                {bus.arrivalMinutes}{"\uBD84 \uD6C4"}
-              </span>
-            </div>
-          ))}
+      <MagicCard className="glass rounded-2xl p-6 text-center" gradientColor="rgba(16,185,129,0.06)">
+        <div className="py-8">
+          <span className="text-5xl mb-4 block">{"\uD83D\uDE8C"}</span>
+          <h3 className="font-bold text-slate-900 mb-2 text-lg">{"\uC774\uB3D9\uC218\uB2E8 \uC815\uBCF4"}</h3>
+          <p className="text-slate-600 font-medium">{"\uACF5\uC601\uC790\uC804\uAC70, \uC2DC\uB0B4\uBC84\uC2A4, \uAD50\uD1B5\uC57D\uC790 \uC774\uB3D9\uC9C0\uC6D0 \uC815\uBCF4\uB97C \uC900\uBE44 \uC911\uC785\uB2C8\uB2E4."}</p>
+          <p className="text-sm text-slate-500 mt-2">{"\uACE7 \uC2E4\uC2DC\uAC04 \uAD50\uD1B5 \uC815\uBCF4\uB97C \uC81C\uACF5\uD560 \uC608\uC815\uC785\uB2C8\uB2E4."}</p>
         </div>
-      </MagicCard>
-
-      <MagicCard className="glass rounded-2xl p-5 border-l-4 border-purple-600" gradientColor="rgba(147,51,234,0.06)">
-        <h3 className="font-bold text-purple-900 flex items-center gap-2 mb-4 text-lg">{"\u267F \uAD50\uD1B5\uC57D\uC790 \uC774\uB3D9\uC9C0\uC6D4"}</h3>
-        <p className="text-sm text-slate-700 font-medium">{mockAccessibleTransport.centerName}</p>
-        <p className="text-sm text-slate-700 mt-2 font-medium">
-          {"\uC774\uC6A9\uAC00\uB2A5 \uCC28\uB7C9: "}<span className="font-bold gradient-text"><NumberTicker value={mockAccessibleTransport.availableVehicles} />{"\uB300"}</span>
-          <span className="text-slate-500"> / {mockAccessibleTransport.totalVehicles}{"\uB300"}</span>
-        </p>
-        <p className="text-sm text-slate-700 mt-2 font-medium">{"\uC608\uC0C1 \uB300\uAE30\uC2DC\uAC04: \uC57D "}<span className="font-bold">{mockAccessibleTransport.estimatedWait}{"\uBD84"}</span></p>
-        <ShimmerButton className="mt-4 w-full py-3 text-sm" shimmerColor="rgba(255,255,255,0.2)" background="linear-gradient(110deg, #7c3aed, #6d28d9, #7c3aed)">
-          {"\uC774\uB3D9\uC9C0\uC6D0 \uC694\uCCAD\uD558\uAE30"}
-        </ShimmerButton>
       </MagicCard>
     </div>
   );
 }
 
 function ReviewTab() {
-  const libReviews = mockReviews.slice(0, 3);
-  const ratings = [
-    { label: "\uC2DC\uC124 \uCCAD\uACB0\uB3C4", score: 4.1 },
-    { label: "\uC18C\uC74C \uC218\uC900", score: 4.5, note: "\uC870\uC6A9\uD568" },
-    { label: "\uC88C\uC11C \uD3B8\uC548\uD568", score: 3.8 },
-    { label: "\uCF58\uC13C\uD2B8/\uC640\uC774\uD30C\uC774", score: 4.0 },
-  ];
-
   return (
     <div className="space-y-5 animate-fade-up">
-      <MagicCard className="glass rounded-2xl py-6 px-4 text-center" gradientColor="rgba(245,158,11,0.08)">
-        <div className="relative">
-          <div className="text-5xl font-bold gradient-text mb-2"><NumberTicker value={4.2} decimalPlaces={1} delay={200} /></div>
-          <div className="flex justify-center gap-1 mb-2">
-            {[1, 2, 3, 4, 5].map((s) => (
-              <svg key={s} className={cn("w-6 h-6 transition", s <= 4 ? "text-amber-400" : "text-slate-300")} fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
-            ))}
-          </div>
-          <p className="text-sm text-slate-600 font-medium">238{"\uAC1C \uB9AC\uBDF0"}</p>
+      <MagicCard className="glass rounded-2xl p-6 text-center" gradientColor="rgba(245,158,11,0.08)">
+        <div className="py-8">
+          <span className="text-5xl mb-4 block">{"\u2B50"}</span>
+          <h3 className="font-bold text-slate-900 mb-2 text-lg">{"\uB9AC\uBDF0"}</h3>
+          <p className="text-slate-600 font-medium">{"\uB3C4\uC11C\uAD00 \uB9AC\uBDF0 \uC11C\uBE44\uC2A4\uB97C \uC900\uBE44 \uC911\uC785\uB2C8\uB2E4."}</p>
+          <p className="text-sm text-slate-500 mt-2">{"\uACE7 \uC774\uC6A9\uC790 \uD6C4\uAE30\uC640 \uD3C9\uC810\uC744 \uC81C\uACF5\uD560 \uC608\uC815\uC785\uB2C8\uB2E4."}</p>
         </div>
       </MagicCard>
-
-      <MagicCard className="glass rounded-2xl p-5" gradientColor="rgba(37,99,235,0.04)">
-        <h4 className="font-bold text-slate-900 mb-4">{"\uD83D\uDCC8 \uD3C9\uAC00 \uD56D\uBAA9"}</h4>
-        <div className="space-y-4">
-          {ratings.map((r) => (
-            <div key={r.label} className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-slate-700 flex-1">{r.label}</span>
-                <span className="text-sm font-bold gradient-text">{r.score}</span>
-                {r.note && <span className="text-xs text-emerald-600 font-semibold">({r.note})</span>}
-              </div>
-              <div className="h-2 bg-slate-200 rounded-full overflow-hidden shadow-inner">
-                <div className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full shadow-sm" style={{ width: `${(r.score / 5) * 100}%` }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </MagicCard>
-
-      <div className="space-y-3">
-        {libReviews.map((review, idx) => (
-          <MagicCard key={review.id} className="glass rounded-2xl" gradientColor="rgba(37,99,235,0.03)">
-            <div className="p-4 animate-fade-up" style={{ animationDelay: `${idx * 50}ms` }}>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md">
-                  {review.userName[0]}
-                </div>
-                <div className="flex-1">
-                  <span className="text-sm font-bold text-slate-900">{review.userName}</span>
-                  <span className="text-xs text-slate-500 ml-2">{review.createdAt}</span>
-                </div>
-                <span className="px-2.5 py-0.5 badge-pill bg-slate-200 text-slate-700">{review.mood}</span>
-              </div>
-              <p className="text-sm text-slate-700 leading-relaxed font-medium">{review.content}</p>
-              <div className="flex items-center gap-4 mt-3 text-xs text-slate-600">
-                <button className="hover:text-blue-600 font-medium transition">{"\uD83D\uDC4D"} {review.helpful}</button>
-                <button className="hover:text-blue-600 font-medium transition">{"\uD83D\uDCAC"} {review.comments}</button>
-                <button className="hover:text-blue-600 font-medium transition">{"\uD83D\uDCCC \uC800\uC7A5"}</button>
-              </div>
-            </div>
-          </MagicCard>
-        ))}
-      </div>
 
       <ShimmerButton className="w-full py-3.5 text-sm" shimmerColor="rgba(255,255,255,0.2)" background="linear-gradient(110deg, #2563eb, #4f46e5, #2563eb)">
         {"\uB9AC\uBDF0 \uC791\uC131\uD558\uAE30"}
