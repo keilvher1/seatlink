@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { mockLibraries } from "@/lib/mock-data";
 import { getCongestionColor, cn } from "@/lib/utils";
 import { LibraryWithDistance } from "@/lib/types";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
@@ -23,16 +22,27 @@ export default function RecommendPage() {
   const [input, setInput] = useState("");
   const [isAiLoading, setIsAiLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [libraries, setLibraries] = useState<any[]>([]);
 
   useEffect(() => {
-    setTimeout(() => {
-      const scored = mockLibraries.map((lib) => ({
-        ...lib,
-        score: Math.round(Math.random() * 40 + 60),
-      }));
-      setRecommendations(scored.sort((a, b) => b.score - a.score));
-      setLoading(false);
-    }, 800);
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/libraries");
+        const data = await res.json();
+        const libs = data.libraries || [];
+        setLibraries(libs);
+        const scored = libs.map((lib) => ({
+          ...lib,
+          score: Math.round(Math.random() * 40 + 60),
+        }));
+        setRecommendations(scored.sort((a, b) => b.score - a.score));
+      } catch (err) {
+        console.error("Failed to fetch libraries:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -133,7 +143,7 @@ export default function RecommendPage() {
                   <div className="text-center py-8 relative">
                     <div className="text-5xl mb-4 animate-float">{"\uD83E\uDD16"}</div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">{"AI \uB3C4\uC11C\uAD00 \uCD94\uCC9C \uC5B4\uC2DC\uC2A4\uD134\uD2B8"}</h3>
-                    <p className="text-sm text-slate-500 mb-6">{"\uC804\uAD6D " + mockLibraries.length + "\uAC1C \uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD558\uC5EC"}<br />{"\uCD5C\uC801\uC758 \uB3C4\uC11C\uAD00\uC744 \uCD94\uCC9C\uD574\uB4DC\uB9BD\uB2C8\uB2E4."}</p>
+                    <p className="text-sm text-slate-500 mb-6">{"\uC804\uAD6D " + libraries.length + "\uAC1C \uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD558\uC5EC"}<br />{"\uCD5C\uC801\uC758 \uB3C4\uC11C\uAD00\uC744 \uCD94\uCC9C\uD574\uB4DC\uB9BD\uB2C8\uB2E4."}</p>
                     <div className="flex flex-wrap gap-2 justify-center max-w-md mx-auto">
                       {quickQuestions.map((q) => (
                         <button key={q} onClick={() => { setInput(q); setTimeout(() => { const btn = document.getElementById("send-btn"); if (btn) btn.click(); }, 100); }} className="px-3 py-2 bg-violet-50 hover:bg-violet-100 text-violet-700 text-xs font-medium rounded-full transition-all hover:scale-105 hover:shadow-md">{q}</button>
@@ -173,7 +183,7 @@ export default function RecommendPage() {
                     {isAiLoading ? "..." : "\uC804\uC1A1"}
                   </ShimmerButton>
                 </div>
-                <p className="text-[10px] text-slate-400 mt-2 text-center">{"AI\uAC00 " + mockLibraries.length + "\uAC1C \uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uC88C\uC11D\uC918 \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD569\uB2C8\uB2E4 \u2022 Powered by OpenAI"}</p>
+                <p className="text-[10px] text-slate-400 mt-2 text-center">{"AI\uAC00 " + libraries.length + "\uAC1C \uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uC88C\uC11D\uC918 \uB370\uC774\uD130\uB97C \uBD84\uC11D\uD569\uB2C8\uB2E4 \u2022 Powered by OpenAI"}</p>
               </div>
             </div>
           </MagicCard>
@@ -198,7 +208,7 @@ export default function RecommendPage() {
         <div className="relative">
           <h3 className="font-bold text-slate-900 mb-4">{"\uD83D\uDCA1 AI \uC778\uC0AC\uC774\uD2B8"}</h3>
           <div className="space-y-3 text-sm text-slate-600">
-            <p>{"\u2713 \uC804\uAD6D " + mockLibraries.length + "\uAC1C \uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uC88C\uC11D \uD604\uD669\uC744 \uBD84\uC11D\uD569\uB2C8\uB2E4"}</p>
+            <p>{"\u2713 \uC804\uAD6D " + libraries.length + "\uAC1C \uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uC88C\uC11D \uD604\uD669\uC744 \uBD84\uC11D\uD569\uB2C8\uB2E4"}</p>
             <p>{"\u2713 GPT-4o mini \uBAA8\uB378\uC774 \uCD5C\uC801\uC758 \uB3C4\uC11C\uAD00\uC744 \uCD94\uCC9C\uD569\uB2C8\uB2E4"}</p>
             <p>{"\u2713 \uC2DC\uC124, \uD63C\uC7A1\uB3C4, \uC6B4\uC601\uC2DC\uAC04 \uB4F1\uC744 \uC885\uD569 \uACE0\uB824\uD569\uB2C8\uB2E4"}</p>
           </div>
