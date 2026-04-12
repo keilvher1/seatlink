@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { mockLibraries, mockDashboardKPI } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
 import { getCongestionColor, cn } from "@/lib/utils";
 import { MagicCard } from "@/components/magicui/magic-card";
 import { NumberTicker } from "@/components/magicui/number-ticker";
@@ -12,27 +11,44 @@ import { Marquee } from "@/components/magicui/marquee";
 import { Particles } from "@/components/magicui/particles";
 
 const alerts = [
-  { id: 1, type: "warning", title: "\uAC15\uB0A8\uAD6C\uB9BD\uB3C4\uC11C\uAD00 \uD63C\uC7A1\uB3C4 95% \uCD08\uACFC", time: "2\uBD84 \uC804", icon: "\u26A0\uFE0F" },
-  { id: 2, type: "info", title: "\uC11C\uC6B8\uC911\uC559\uB3C4\uC11C\uAD00 \uC57C\uAC04 \uC6B4\uC601 \uC2DC\uC791", time: "15\uBD84 \uC804", icon: "\uD83C\uDF19" },
-  { id: 3, type: "success", title: "\uBD80\uC0B0\uC2DC\uB9BD\uC2DC\uBBFC\uB3C4\uC11C\uAD00 \uC2E0\uADDC \uC5F0\uB3D9 \uC644\uB8CC", time: "1\uC2DC\uAC04 \uC804", icon: "\u2705" },
-  { id: 4, type: "warning", title: "\uB300\uC804\uD55C\uBC24\uB3C4\uC11C\uAD00 \uC13C\uC11C \uC5F0\uACB0 \uBD88\uC548\uC815", time: "30\uBD84 \uC804", icon: "\uD83D\uDD27" },
-  { id: 5, type: "info", title: "\uC804\uAD6D \uB3C4\uC11C\uAD00 \uC8FC\uAC04 \uBCF4\uACE0\uC11C \uC0DD\uC131 \uC644\uB8CC", time: "2\uC2DC\uAC04 \uC804", icon: "\uD83D\uDCCA" },
+  { id: 1, type: "warning", title: "\uD63C\uC7A1\uB3C4 90% \uCD08\uACFC \uB3C4\uC11C\uAD00 \uBC1C\uC0DD", time: "2\uBD84 \uC804", icon: "\u26A0\uFE0F" },
+  { id: 2, type: "info", title: "\uC57C\uAC04 \uC6B4\uC601 \uB3C4\uC11C\uAD00 \uD655\uC778", time: "15\uBD84 \uC804", icon: "\uD83C\uDF19" },
+  { id: 3, type: "success", title: "\uC2E0\uADDC \uB3C4\uC11C\uAD00 \uC5F0\uB3D9 \uC644\uB8CC", time: "1\uC2DC\uAC04 \uC804", icon: "\u2705" },
+  { id: 4, type: "warning", title: "API \uC5F0\uACB0 \uBD88\uC548\uC815 \uAC10\uC9C0", time: "30\uBD84 \uC804", icon: "\uD83D\uDD27" },
+  { id: 5, type: "info", title: "\uC8FC\uAC04 \uBCF4\uACE0\uC11C \uC0DD\uC131 \uC644\uB8CC", time: "2\uC2DC\uAC04 \uC804", icon: "\uD83D\uDCCA" },
 ];
 
 const systemMetrics = [
   { label: "API \uC751\uB2F5\uC2DC\uAC04", value: "42ms", status: "good", icon: "\u26A1" },
-  { label: "\uC13C\uC11C \uC5F0\uACB0\uB960", value: "99.2%", status: "good", icon: "\uD83D\uDCE1" },
-  { label: "\uC2E4\uC2DC\uAC04 \uC5C5\uB370\uC774\uD2B8 \uC8FC\uAE30", value: "30\uCD08", status: "good", icon: "\uD83D\uDD04" },
-  { label: "\uAE08\uC77C \uB370\uC774\uD130 \uCC98\uB9AC\uB7C9", value: "2.4M", status: "good", icon: "\uD83D\uDCBE" },
+  { label: "API \uC5F0\uACB0 \uC0C1\uD0DC", value: "\uC815\uC0C1", status: "good", icon: "\uD83D\uDCE1" },
+  { label: "\uC2E4\uC2DC\uAC04 \uC5C5\uB370\uC774\uD2B8 \uC8FC\uAE30", value: "60\uCD08", status: "good", icon: "\uD83D\uDD04" },
+  { label: "\uB370\uC774\uD130 \uC18C\uC2A4", value: "data.go.kr", status: "good", icon: "\uD83D\uDCBE" },
 ];
 
 export default function AdminPage() {
   const [activeSection, setActiveSection] = useState<"overview" | "libraries" | "alerts" | "settings">("overview");
+  const [libraries, setLibraries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const totalLibraries = mockLibraries.length;
-  const crowdedLibraries = mockLibraries.filter(l => l.congestionLevel === "\uD63C\uC7A1").length;
-  const normalLibraries = mockLibraries.filter(l => l.congestionLevel === "\uBCF4\uD1B5").length;
-  const freeLibraries = mockLibraries.filter(l => l.congestionLevel === "\uC5EC\uC720").length;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/libraries");
+        const data = await res.json();
+        setLibraries(data.libraries || []);
+      } catch (err) {
+        console.error("Failed to fetch libraries:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const totalLibraries = libraries.length;
+  const crowdedLibraries = libraries.filter((l: any) => l.congestionLevel === "\uD63C\uC7A1").length;
+  const normalLibraries = libraries.filter((l: any) => l.congestionLevel === "\uBCF4\uD1B5").length;
+  const freeLibraries = libraries.filter((l: any) => l.congestionLevel === "\uC5EC\uC720").length;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 pb-24 md:pb-8 relative min-h-screen">
@@ -88,7 +104,7 @@ export default function AdminPage() {
                 <BorderBeam size={100} duration={8} colorFrom="#2563eb" colorTo="#818cf8" />
                 <span className="text-2xl">{"\uD83C\uDFDB\uFE0F"}</span>
                 <p className="text-xs text-slate-500 font-medium mt-2">{"\uCD1D \uB3C4\uC11C\uAD00"}</p>
-                <p className="text-2xl font-bold gradient-text mt-1"><NumberTicker value={totalLibraries} delay={200} />{"\uAC1C"}</p>
+                <p className="text-2xl font-bold gradient-text mt-1">{loading ? "..." : <><NumberTicker value={totalLibraries} delay={200} />{"\uAC1C"}</>}</p>
               </div>
             </MagicCard>
 
@@ -97,7 +113,7 @@ export default function AdminPage() {
                 <BorderBeam size={100} duration={10} colorFrom="#ef4444" colorTo="#f97316" delay={2} />
                 <span className="text-2xl">{"\uD83D\uDD25"}</span>
                 <p className="text-xs text-slate-500 font-medium mt-2">{"\uD63C\uC7A1 \uB3C4\uC11C\uAD00"}</p>
-                <p className="text-2xl font-bold text-red-600 mt-1"><NumberTicker value={crowdedLibraries} delay={400} />{"\uAC1C"}</p>
+                <p className="text-2xl font-bold text-red-600 mt-1">{loading ? "..." : <><NumberTicker value={crowdedLibraries} delay={400} />{"\uAC1C"}</>}</p>
               </div>
             </MagicCard>
 
@@ -106,16 +122,15 @@ export default function AdminPage() {
                 <BorderBeam size={100} duration={12} colorFrom="#f59e0b" colorTo="#fbbf24" delay={4} />
                 <span className="text-2xl">{"\u26A0\uFE0F"}</span>
                 <p className="text-xs text-slate-500 font-medium mt-2">{"\uBCF4\uD1B5 \uB3C4\uC11C\uAD00"}</p>
-                <p className="text-2xl font-bold text-amber-600 mt-1"><NumberTicker value={normalLibraries} delay={600} />{"\uAC1C"}</p>
+                <p className="text-2xl font-bold text-amber-600 mt-1">{loading ? "..." : <><NumberTicker value={normalLibraries} delay={600} />{"\uAC1C"}</>}</p>
               </div>
             </MagicCard>
 
             <MagicCard className="glass p-5 hover:scale-105 transition-all duration-300" gradientColor="rgba(34,197,94,0.12)">
               <div className="relative">
-                <BorderBeam size={100} duration={14} colorFrom="#22c55e" colorTo="#4ade80" delay={6} />
-                <span className="text-2xl">{"\u2705"}</span>
+                <BorderBeam size={100} duration={14} colorFrom="#22c55e" colorTo="#4ade80" delay={6} />              <span className="text-2xl">{"\u2705"}</span>
                 <p className="text-xs text-slate-500 font-medium mt-2">{"\uC5EC\uC720 \uB3C4\uC11C\uAD00"}</p>
-                <p className="text-2xl font-bold text-emerald-600 mt-1"><NumberTicker value={freeLibraries} delay={800} />{"\uAC1C"}</p>
+                <p className="text-2xl font-bold text-emerald-600 mt-1">{loading ? "..." : <><NumberTicker value={freeLibraries} delay={800} />{"\uAC1C"}</>}</p>
               </div>
             </MagicCard>
           </div>
@@ -170,9 +185,18 @@ export default function AdminPage() {
               <span className="text-xs text-slate-500">{"\uCD1D "}{totalLibraries}{"\uAC1C \uB3C4\uC11C\uAD00"}</span>
             </div>
           </div>
-          {mockLibraries.map((lib, idx) => {
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-slate-600 font-medium">{"\uB370\uC774\uD130\uB97C \uBD88\uB7EC\uC624\uB294 \uC911..."}</p>
+            </div>
+          ) : libraries.length === 0 ? (
+            <MagicCard className="glass rounded-2xl p-6 text-center" gradientColor="rgba(37,99,235,0.04)">
+              <p className="text-slate-600 font-medium">{"\uC5F0\uB3D9\uB41C \uB3C4\uC11C\uAD00\uC774 \uC5C6\uC2B5\uB2C8\uB2E4."}</p>
+            </MagicCard>
+          ) : libraries.map((lib: any, idx: number) => {
             const color = getCongestionColor(lib.congestionLevel);
-            const usagePercent = Math.round((lib.totalUsed / lib.totalSeats) * 100);
+            const usagePercent = lib.totalSeats > 0 ? Math.round((lib.totalUsed / lib.totalSeats) * 100) : 0;
             return (
               <MagicCard key={lib.id} className="glass rounded-2xl overflow-hidden" gradientColor="rgba(37,99,235,0.04)">
                 <div className="p-4 animate-fade-up" style={{ animationDelay: `${idx * 30}ms` }}>
@@ -195,7 +219,7 @@ export default function AdminPage() {
                         <div className={cn("h-full rounded-full transition-all duration-500", color.bg)} style={{ width: `${usagePercent}%` }} />
                       </div>
                       <div className="flex items-center gap-4 text-xs text-slate-500">
-                        <span>{"\uCD1D "}{lib.totalSeats}{"\uC11D"}</span>
+                        <span>{"\uCD1C "}{lib.totalSeats}{"\uC11D"}</span>
                         <span>{"\uC794\uC5EC "}<span className="font-bold text-slate-700">{lib.totalAvailable}</span>{"\uC11D"}</span>
                         <span>{"\uBC29\uBB38\uC790 "}{lib.todayVisitors}{"\uBA85"}</span>
                         {lib.nightOperation && <span className="text-indigo-600 font-medium">{"\uD83C\uDF19 \uC57C\uAC04"}</span>}
@@ -225,9 +249,9 @@ export default function AdminPage() {
             <div className="space-y-3">
               {[
                 { rule: "\uD63C\uC7A1\uB3C4 90% \uC774\uC0C1 \uC2DC \uACBD\uACE0", enabled: true, type: "warning" },
-                { rule: "\uC13C\uC11C \uC5F0\uACB0 \uB04A\uAE40 \uC2DC \uC54C\uB9BC", enabled: true, type: "error" },
+                { rule: "API \uC5F0\uACB0 \uB04A\uAE40 \uC2DC \uC54C\uB9BC", enabled: true, type: "error" },
                 { rule: "\uC2E0\uADDC \uB3C4\uC11C\uAD00 \uC5F0\uB3D9 \uC644\uB8CC \uC2DC \uC54C\uB9BC", enabled: true, type: "success" },
-                { rule: "\uC8FC\uAC04 \uBCF4\uACE0\uC11C \uC0DD\uC131 \uC644\uB8CC \uC2DC \uC54C\uB9BC", enabled: false, type: "info" },
+                { rule: "\uC8FC\uAC04 \uBCF4\uACE0\uC11C \uC0DD\uC131 \uC644\uB8CC \uC2DC \uC54C\uB9BC", enabledalse, type: "info" },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between glass-subtle rounded-xl px-4 py-3">
                   <div className="flex items-center gap-3">
@@ -250,7 +274,7 @@ export default function AdminPage() {
 
           {/* Alert History */}
           <div className="space-y-3">
-            {alerts.concat(alerts).map((alert, idx) => (
+            {alerts.map((alert, idx) => (
               <MagicCard key={`${alert.id}-${idx}`} className="glass rounded-xl overflow-hidden" gradientColor={
                 alert.type === "warning" ? "rgba(245,158,11,0.08)" :
                 alert.type === "success" ? "rgba(34,197,94,0.08)" : "rgba(37,99,235,0.08)"
@@ -276,10 +300,10 @@ export default function AdminPage() {
             <h3 className="font-bold text-slate-900 mb-4 text-lg">{"\u2699\uFE0F \uC2DC\uC2A4\uD15C \uC124\uC815"}</h3>
             <div className="space-y-4">
               {[
-                { label: "\uC2E4\uC2DC\uAC04 \uB370\uC774\uD130 \uC5C5\uB370\uC774\uD2B8 \uC8FC\uAE30", value: "30\uCD08", type: "select" },
+                { label: "\uC2E4\uC2DC\uAC04 \uB370\uC774\uD130 \uC5C5\uB370\uC774\uD2B8 \uC8FC\uAE30", value: "60\uCD08", type: "select" },
                 { label: "\uD63C\uC7A1\uB3C4 \uACBD\uACE0 \uC784\uACC4\uAC12", value: "90%", type: "input" },
                 { label: "\uC790\uB3D9 \uBCF4\uACE0\uC11C \uC0DD\uC131", value: true, type: "toggle" },
-                { label: "\uC13C\uC11C \uC5F0\uACB0 \uBAA8\uB2C8\uD130\uB9C1", value: true, type: "toggle" },
+                { label: "API \uC5F0\uACB0 \uBAA8\uB2C8\uD130\uB9C1", value: true, type: "toggle" },
                 { label: "\uC774\uBA54\uC77C \uC54C\uB9BC", value: false, type: "toggle" },
               ].map((setting, i) => (
                 <div key={i} className="flex items-center justify-between glass-subtle rounded-xl px-4 py-3">
