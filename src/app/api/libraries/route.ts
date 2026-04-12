@@ -58,6 +58,9 @@ export async function GET(request: NextRequest) {
           realtimeItemCount: realtime.items.length,
           apiKeySet: !!process.env.DATA_GO_KR_API_KEY,
           apiKeyPrefix: process.env.DATA_GO_KR_API_KEY ? process.env.DATA_GO_KR_API_KEY.substring(0, 8) + "..." : "none",
+          infoApiError: info.error || null,
+          statusApiError: status.error || null,
+          realtimeApiError: realtime.error || null,
         },
       });
     }
