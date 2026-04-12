@@ -12,7 +12,8 @@ export default function HomePage() {
   const [radius, setRadius] = useState(30);
   const [sortBy, setSortBy] = useState<"distance" | "seats">("distance");
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [userPos, setUserPos] = useState<[number, number]>([36.5, 127.5]);
+  const [userPos, setUserPos] = useState<[number, number] | null>(null);
+  const [locationLoading, setLocationLoading] = useState(true);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapObjRef = useRef<any>(null);
   const markerLayerRef = useRef<any>(null);
@@ -40,6 +41,8 @@ export default function HomePage() {
   };
 
   const sorted = useMemo(() => {
+    if (!userPos) return [];
+    
     const list = mockLibraries.map((lib) => {
       const distance = calculateDistance(userPos[0], userPos[1], lib.lat, lib.lng);
       return {
@@ -56,10 +59,12 @@ export default function HomePage() {
 
   const requestGeolocation = () => {
     if ("geolocation" in navigator) {
+      setLocationLoading(true);
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           setUserPos([latitude, longitude]);
+          setLocationLoading(false);
           if (mapObjRef.current) {
             mapObjRef.current.setView([latitude, longitude], 12);
             updateUserMarker([latitude, longitude]);
@@ -67,8 +72,20 @@ export default function HomePage() {
         },
         (error) => {
           console.log("Geolocation denied or unavailable:", error);
+          // Fallback to default location (Seoul) if geolocation fails
+          setUserPos([37.5665, 126.9780]);
+          setLocationLoading(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000,
         }
       );
+    } else {
+      // Fallback if geolocation not available
+      setUserPos([37.5665, 126.9780]);
+      setLocationLoading(false);
     }
   };
 
@@ -77,8 +94,14 @@ export default function HomePage() {
     userMarkerRef.current.setLatLng(pos);
   };
 
+  // Request geolocation on mount
   useEffect(() => {
-    if (!mapRef.current || mapObjRef.current) return;
+    requestGeolocation();
+  }, []);
+
+  // Initialize map after we have user position
+  useEffect(() => {
+    if (!mapRef.current || mapObjRef.current || !userPos) return;
 
     const initLeaflet = async () => {
       const L = (await import("leaflet")).default;
@@ -89,7 +112,7 @@ export default function HomePage() {
         shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
       });
 
-      const map = L.map(mapRef.current!, { center: userPos, zoom: 7, zoomControl: false });
+      const map = L.map(mapRef.current!, { center: userPos, zoom: 12, zoomControl: false });
       L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { attribution: "", maxZoom: 19 }).addTo(map);
       L.control.zoom({ position: "topright" }).addTo(map);
 
@@ -114,8 +137,7 @@ export default function HomePage() {
     }
 
     initLeaflet();
-    requestGeolocation();
-  }, []);
+  }, [userPos]);
 
   const updateMarkers = async (LParam?: any) => {
     const L = LParam || (await import("leaflet")).default;
@@ -149,6 +171,15 @@ export default function HomePage() {
 
   return (
     <div className="relative h-[calc(100vh-56px)] overflow-hidden">
+      {/* Loading overlay */}
+      {locationLoading && (
+        <div className="absolute inset-0 z-[2000] bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4" />
+          <p className="text-slate-600 font-medium">{"현재 위치를 확인하고 있습니다..."}</p>
+          <p className="text-slate-400 text-sm mt-1">{"위치 권한을 허용해주세요"}</p>
+        </div>
+      )}
+      
       {/* Map */}
       <div className="absolute inset-0">
         <div ref={mapRef} id="map-container" className="w-full h-full z-0" />
