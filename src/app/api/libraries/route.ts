@@ -4,35 +4,32 @@ import {
   fetchLibraryStatus,
   fetchLibraryRealtime,
 } from "@/lib/api-client";
-import { mockLibraries } from "@/lib/mock-data";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const stdgCd = searchParams.get("stdgCd") || undefined;
-  const useMock = !process.env.DATA_GO_KR_API_KEY;
 
-  // API 키가 없으면 목업 데이터 반환
-  if (useMock) {
-    console.log("[Libraries] No API key, using mock data");
+  if (!process.env.DATA_GO_KR_API_KEY) {
+    console.log("[Libraries] No API key configured");
     return NextResponse.json({
-      libraries: mockLibraries,
-      totalCount: mockLibraries.length,
+      libraries: [],
+      totalCount: 0,
       updatedAt: new Date().toISOString(),
-      source: "mock",
+      source: "no-api-key",
     });
   }
 
   try {
     console.log("[Libraries] Fetching from data.go.kr APIs...");
 
-    // 3개 API를 병렬로 호출
+    // 3ê° APIë¥¼ ë³ë ¬ë¡ í¸ì¶
     const [infoRes, statusRes, realtimeRes] = await Promise.allSettled([
       fetchLibraryInfo(stdgCd),
       fetchLibraryStatus(stdgCd),
       fetchLibraryRealtime(stdgCd),
     ]);
 
-    // settled 결과에서 안전하게 추출
+    // settled ê²°ê³¼ìì ìì íê² ì¶ì¶
     const info = infoRes.status === "fulfilled" ? infoRes.value : { items: [], totalCount: 0 };
     const status = statusRes.status === "fulfilled" ? statusRes.value : { items: [], totalCount: 0 };
     const realtime = realtimeRes.status === "fulfilled" ? realtimeRes.value : { items: [], totalCount: 0 };
@@ -41,14 +38,14 @@ export async function GET(request: NextRequest) {
       `[Libraries] API results - info: ${info.items.length}, status: ${status.items.length}, realtime: ${realtime.items.length}`
     );
 
-    // 하나도 데이터가 없으면 mock 폴백
+    // íëë ë°ì´í°ê° ìì¼ë©´ ë¹ ë°°ì´ ë°í
     if (info.items.length === 0 && status.items.length === 0 && realtime.items.length === 0) {
-      console.warn("[Libraries] All APIs returned empty, falling back to mock data");
+      console.warn("[Libraries] All APIs returned empty");
       return NextResponse.json({
-        libraries: mockLibraries,
-        totalCount: mockLibraries.length,
+        libraries: [],
+        totalCount: 0,
         updatedAt: new Date().toISOString(),
-        source: "mock-fallback",
+        source: "api-empty",
         debug: {
           infoStatus: infoRes.status,
           statusStatus: statusRes.status,
@@ -60,12 +57,11 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 데이터 병합: 도서관 ID 기준
+    // ë°ì´í° ë³í©: ëìê´ ID ê¸°ì¤
     const libraryMap = new Map<string, any>();
 
-    // 1) 기본정보 매핑
+    // 1) ê¸°ë³¸ì ë³´ ë§¤í
     for (const item of info.items) {
-      // ID 추출: pblibId가 기본, 없으면 다른 필드 조합
       const id =
         item.pblibId ||
         item.lbrrySeCode ||
@@ -73,11 +69,9 @@ export async function GET(request: NextRequest) {
 
       if (!id) continue;
 
-      // 위도/경도 필드명 다양하게 대응
       const lat = parseFloat(item.lat || item.latitude || item.la || "0");
       const lng = parseFloat(item.lot || item.longitude || item.lo || item.lng || "0");
 
-      // 운영시간 파싱
       const weekdayStart = item.wkdyOperBgngTm || item.weekdayOperOpenHhmm || "09:00";
       const weekdayEnd = item.wkdyOperEndTm || item.weekdayOperColseHhmm || "18:00";
       const satStart = item.satOperBgngTm || item.satOperOpenHhmm || "09:00";
@@ -95,7 +89,7 @@ export async function GET(request: NextRequest) {
         operatingHours: {
           weekday: `${weekdayStart}~${weekdayEnd}`,
           saturday: `${satStart}~${satEnd}`,
-          holiday: holStart ? `${holStart}~${holEnd}` : "휴관",
+          holiday: holStart ? `${holStart}~${holEnd}` : "í´ê´",
         },
         nightOperation: parseInt(weekdayEnd.replace(":", "")) >= 2100,
         accessible: true,
@@ -104,7 +98,7 @@ export async function GET(request: NextRequest) {
         parking: item.parkngLotCo ? parseInt(item.parkngLotCo) > 0 : false,
         todayVisitors: 0,
         seatUsageRate: 0,
-        congestionLevel: "여유" as const,
+        congestionLevel: "ì¬ì " as const,
         rooms: [] as any[],
         totalSeats: parseInt(item.tseatCnt || item.totalSeatCo || "0") || 0,
         totalUsed: 0,
@@ -112,7 +106,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 2) 운영현황 매핑
+    // 2) ì´ìíí© ë§¤í
     for (const item of status.items) {
       const id =
         item.pblibId ||
@@ -121,7 +115,6 @@ export async function GET(request: NextRequest) {
 
       let lib = libraryMap.get(id);
 
-      // info에 없었지만 status에는 있는 경우 → 새로 생성
       if (!lib && item.pblibNm) {
         lib = {
           id,
@@ -138,7 +131,7 @@ export async function GET(request: NextRequest) {
           parking: false,
           todayVisitors: 0,
           seatUsageRate: 0,
-          congestionLevel: "여유" as const,
+          congestionLevel: "ì¬ì " as const,
           rooms: [] as any[],
           totalSeats: 0,
           totalUsed: 0,
@@ -152,18 +145,17 @@ export async function GET(request: NextRequest) {
         lib.seatUsageRate = parseFloat(item.seatUsgrt || item.seatUsageRate || "0") || 0;
         lib.reservable = item.rsvtPsbltyYn === "Y" || item.reservationAt === "Y";
 
-        // 운영상태
         const operStatus = item.operSttsNm || item.operSttus || "";
-        if (operStatus === "휴관" || operStatus === "임시휴관") {
-          lib.congestionLevel = "여유";
+        if (operStatus === "í´ê´" || operStatus === "ììí´ê´") {
+          lib.congestionLevel = "ì¬ì ";
         } else {
           const rate = lib.seatUsageRate;
-          lib.congestionLevel = rate < 40 ? "여유" : rate <= 70 ? "보통" : "혼잡";
+          lib.congestionLevel = rate < 40 ? "ì¬ì " : rate <= 70 ? "ë³´íµ" : "í¼ì¡";
         }
       }
     }
 
-    // 3) 실시간 열람실 매핑
+    // 3) ì¤ìê° ì´ëì¤ ë§¤í
     for (const item of realtime.items) {
       const id =
         item.pblibId ||
@@ -188,7 +180,7 @@ export async function GET(request: NextRequest) {
           parking: false,
           todayVisitors: 0,
           seatUsageRate: 0,
-          congestionLevel: "여유" as const,
+          congestionLevel: "ì¬ì " as const,
           rooms: [] as any[],
           totalSeats: 0,
           totalUsed: 0,
@@ -206,54 +198,32 @@ export async function GET(request: NextRequest) {
         const pct = total > 0 ? Math.round((used / total) * 100) : 0;
 
         lib.rooms.push({
-          name: item.rdrmNm || item.roomNm || "열람실",
+          name: item.rdrmNm || item.roomNm || "ì´ëì¤",
           totalSeats: total,
           usedSeats: used,
           availableSeats: available,
           congestionPercent: pct,
-          congestionLevel: pct < 40 ? "여유" : pct <= 70 ? "보통" : ("혼잡" as const),
+          congestionLevel: pct < 40 ? "ì¬ì " : pct <= 70 ? "ë³´íµ" : ("í¼ì¡" as const),
           lastUpdated: item.dataStdr || new Date().toISOString(),
         });
 
-        // 전체 합산 업데이트
         lib.totalSeats = lib.rooms.reduce((s: number, r: any) => s + r.totalSeats, 0);
         lib.totalUsed = lib.rooms.reduce((s: number, r: any) => s + r.usedSeats, 0);
         lib.totalAvailable = lib.rooms.reduce((s: number, r: any) => s + r.availableSeats, 0);
 
-        // 전체 혼잡도 재계산
         if (lib.totalSeats > 0) {
           lib.seatUsageRate = Math.round((lib.totalUsed / lib.totalSeats) * 100);
           lib.congestionLevel =
-            lib.seatUsageRate < 40 ? "여유" : lib.seatUsageRate <= 70 ? "보통" : "혼잡";
+            lib.seatUsageRate < 40 ? "ì¬ì " : lib.seatUsageRate <= 70 ? "ë³´íµ" : "í¼ì¡";
         }
       }
     }
 
-    // 유효한 도서관만 필터 (이름이 있는 것)
     const libraries = Array.from(libraryMap.values()).filter(
       (l) => l.name && l.name.length > 0
     );
 
     console.log(`[Libraries] Final: ${libraries.length} libraries (${libraries.filter((l: any) => l.lat !== 0).length} with coordinates)`);
-
-    // 데이터가 너무 적으면 mock과 병합
-    if (libraries.length < 5) {
-      console.warn("[Libraries] Too few results, supplementing with mock data");
-      const apiIds = new Set(libraries.map((l) => l.id));
-      const supplement = mockLibraries.filter((m) => !apiIds.has(m.id));
-      return NextResponse.json(
-        {
-          libraries: [...libraries, ...supplement],
-          totalCount: libraries.length + supplement.length,
-          updatedAt: new Date().toISOString(),
-          source: "api+mock-supplement",
-          apiCount: libraries.length,
-        },
-        {
-          headers: { "Cache-Control": "public, max-age=60, stale-while-revalidate=120" },
-        }
-      );
-    }
 
     return NextResponse.json(
       {
@@ -268,12 +238,11 @@ export async function GET(request: NextRequest) {
     );
   } catch (error: any) {
     console.error("[Libraries] Fatal error:", error.message || error);
-    // 에러 시 목업 데이터 폴백
     return NextResponse.json({
-      libraries: mockLibraries,
-      totalCount: mockLibraries.length,
+      libraries: [],
+      totalCount: 0,
       updatedAt: new Date().toISOString(),
-      source: "mock-fallback",
+      source: "error",
       error: error.message,
     });
   }
