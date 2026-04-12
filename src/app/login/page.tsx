@@ -2,13 +2,22 @@
 
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { Ripple } from "@/components/magicui/ripple";
+import { Spotlight } from "@/components/magicui/spotlight";
+import { BorderBeam } from "@/components/magicui/border-beam";
+import { AnimatedGradientText } from "@/components/magicui/animated-gradient-text";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-slate-50 to-indigo-50 px-4">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-slate-50 to-indigo-50 px-4 relative overflow-hidden">
+      {/* Background Effects */}
+      <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="#3b82f6" />
+      <Ripple mainCircleSize={300} mainCircleOpacity={0.1} numCircles={6} className="opacity-30" />
+      
+      <div className="w-full max-w-sm relative z-10">
         {/* Glassmorphic Card */}
-        <div className="glass rounded-3xl p-8 shadow-2xl shadow-blue-500/10 backdrop-blur-xl border border-white/20">
+        <div className="glass rounded-3xl p-8 shadow-2xl shadow-blue-500/10 backdrop-blur-xl border border-white/20 relative overflow-hidden">
+          <BorderBeam size={300} duration={12} colorFrom="#3b82f6" colorTo="#8b5cf6" />
           {/* Heading */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
@@ -16,7 +25,9 @@ export default function LoginPage() {
                 <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">좌석이음에 오신 것을 환영합니다</h1>
+            <h1 className="text-2xl font-bold">
+              <AnimatedGradientText>{"좌석이음에 오신 것을 환영합니다"}</AnimatedGradientText>
+            </h1>
             <p className="text-sm text-slate-500 mt-2">전국 도서관 실시간 좌석 정보를 한눈에</p>
           </div>
 

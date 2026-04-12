@@ -40,6 +40,11 @@ const config: Config = {
         "fade-up": "fade-up 0.6s ease-out",
         "fade-down": "fade-down 0.6s ease-out",
         "scale-in": "scale-in 0.5s ease-out",
+        "aurora": "aurora 60s linear infinite",
+        "spotlight": "spotlight 2s ease .75s 1 forwards",
+        "ripple": "ripple 3400ms ease infinite",
+        "meteor-effect": "meteor-effect 5s linear infinite",
+        "gradient": "gradient 8s linear infinite",
       },
       keyframes: {
         "shimmer-slide": {
@@ -81,6 +86,28 @@ const config: Config = {
         "scale-in": {
           "0%": { opacity: "0", transform: "scale(0.9)" },
           "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        "aurora": {
+          "from": { "background-position": "50% 50%, 50% 50%" },
+          "to": { "background-position": "350% 50%, 350% 50%" },
+        },
+        "spotlight": {
+          "0%": { opacity: "0", transform: "translate(-72%, -62%) scale(0.5)" },
+          "100%": { opacity: "1", transform: "translate(-50%, -40%) scale(1)" },
+        },
+        "ripple": {
+          "0%, 100%": { transform: "translate(-50%, -50%) scale(1)" },
+          "50%": { transform: "translate(-50%, -50%) scale(0.9)" },
+        },
+        "meteor-effect": {
+          "0%": { transform: "rotate(215deg) translateX(0)", opacity: "1" },
+          "70%": { opacity: "1" },
+          "100%": { transform: "rotate(215deg) translateX(-500px)", opacity: "0" },
+        },
+        "gradient": {
+          "0%": { "background-position": "0% 50%" },
+          "50%": { "background-position": "100% 50%" },
+          "100%": { "background-position": "0% 50%" },
         },
       },
     },

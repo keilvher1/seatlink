@@ -11,6 +11,8 @@ import { NumberTicker } from "@/components/magicui/number-ticker";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { AnimatedShinyText } from "@/components/magicui/animated-shiny-text";
 import { Marquee } from "@/components/magicui/marquee";
+import { Particles } from "@/components/magicui/particles";
+import { AnimatedGradientText } from "@/components/magicui/animated-gradient-text";
 
 const liveStats = [
   { icon: "\uD83D\uDCDA", text: "\uC11C\uC6B8\uC911\uC559\uB3C4\uC11C\uAD00 \uC794\uC5EC 86\uC11D" },
@@ -23,14 +25,17 @@ const liveStats = [
 
 export default function DashboardPage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 pb-24 md:pb-8 relative">
+    <div className="max-w-7xl mx-auto px-4 py-8 pb-24 md:pb-8 relative overflow-hidden">
+      {/* Background Effects */}
+      <Particles className="absolute inset-0 -z-10" quantity={40} color="#3b82f6" size={0.6} speed={0.15} />
       {/* í¤ë */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 animate-fade-up">
         <div>
-          <AnimatedShinyText className="text-2xl sm:text-3xl font-bold gradient-text" shimmerWidth={150}>
-            {"\uD83D\uDCCA"} {"\uC804\uAD6D \uB3C4\uC11C\uAD00 \uB370\uC774\uD130 \uB300\uC2DC\uBCF4\uB4DC"}
-          </AnimatedShinyText>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 sm:mt-2">{"\uC804\uAD6D \uACF5\uACF5\uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uC774\uC6A9 \uD604\uD669\uACFC \uD2B8\uB80C\uB4DC\uB97C \uD55C\uB208\uC5D0"}</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">
+            {"📊 "}
+            <AnimatedGradientText>{"전국 도서관 데이터 대시보드"}</AnimatedGradientText>
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1 sm:mt-2">{"전국 공공도서관의 실시간 이용 현황과 트렌드를 한눈에"}</p>
         </div>
         <div className="flex items-center gap-2 text-xs sm:text-sm text-emerald-600 glass rounded-full px-3 sm:px-4 py-1.5 sm:py-2 self-start sm:self-auto shrink-0">
           <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />

@@ -7,6 +7,8 @@ import { LibraryWithDistance } from "@/lib/types";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { AnimatedShinyText } from "@/components/magicui/animated-shiny-text";
 import { Particles } from "@/components/magicui/particles";
+import { Ripple } from "@/components/magicui/ripple";
+import { AnimatedGradientText } from "@/components/magicui/animated-gradient-text";
 
 export default function HomePage() {
   const [radius, setRadius] = useState(30);
@@ -173,10 +175,20 @@ export default function HomePage() {
     <div className="relative h-[calc(100vh-56px)] overflow-hidden">
       {/* Loading overlay */}
       {locationLoading && (
-        <div className="absolute inset-0 z-[2000] bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center">
-          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4" />
-          <p className="text-slate-600 font-medium">{"현재 위치를 확인하고 있습니다..."}</p>
-          <p className="text-slate-400 text-sm mt-1">{"위치 권한을 허용해주세요"}</p>
+        <div className="absolute inset-0 z-[2000] bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex flex-col items-center justify-center overflow-hidden">
+          <Ripple mainCircleSize={200} mainCircleOpacity={0.15} numCircles={5} />
+          <div className="relative z-10 flex flex-col items-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 mb-6 animate-pulse">
+              <svg viewBox="0 0 24 24" className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold mb-2">
+              <AnimatedGradientText>{"좌석이음"}</AnimatedGradientText>
+            </h2>
+            <p className="text-slate-600 font-medium mb-1">{"현재 위치를 확인하고 있습니다..."}</p>
+            <p className="text-slate-400 text-sm">{"위치 권한을 허용해주세요"}</p>
+          </div>
         </div>
       )}
       
