@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from "react";
 import {
-  LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, Cell, PieChart, Pie,
 } from "recharts";
 import { getCongestionHex, cn } from "@/lib/utils";
 import { MagicCard } from "@/components/magicui/magic-card";
 import { NumberTicker } from "@/components/magicui/number-ticker";
 import { BorderBeam } from "@/components/magicui/border-beam";
-import { AnimatedShinyText } from "@/components/magicui/animated-shiny-text";
 import { Marquee } from "@/components/magicui/marquee";
 import { Particles } from "@/components/magicui/particles";
 import { AnimatedGradientText } from "@/components/magicui/animated-gradient-text";
@@ -33,18 +32,18 @@ export default function DashboardPage() {
     fetchData();
   }, []);
 
-  // KPI \uACC4\uC0B0
+  // KPI ê³ì°
   const totalLibraries = libraries.length;
   const currentUsers = libraries.reduce((sum: number, l: any) => sum + (l.totalUsed || 0), 0);
   const totalSeats = libraries.reduce((sum: number, l: any) => sum + (l.totalSeats || 0), 0);
   const totalAvailable = libraries.reduce((sum: number, l: any) => sum + (l.totalAvailable || 0), 0);
   const averageUsageRate = totalSeats > 0 ? Math.round((currentUsers / totalSeats) * 100 * 10) / 10 : 0;
 
-  // \uC9C0\uC5ED\uBCC4 \uC774\uC6A9\uB960 \uACC4\uC0B0
+  // ì§ì­ë³ ì´ì©ë¥  ê³ì°
   const regionMap = new Map<string, { total: number; used: number }>();
   libraries.forEach((lib: any) => {
     const addr = lib.address || "";
-    const region = addr.split(" ")[0] || "\uAE30\uD0C0";
+    const region = addr.split(" ")[0] || "ê¸°í";
     const prev = regionMap.get(region) || { total: 0, used: 0 };
     regionMap.set(region, { total: prev.total + (lib.totalSeats || 0), used: prev.used + (lib.totalUsed || 0) });
   });
@@ -53,16 +52,22 @@ export default function DashboardPage() {
     .sort((a, b) => b.usageRate - a.usageRate)
     .slice(0, 10);
 
-  // \uD63C\uC7A1\uB3C4\uBCC4 \uB3C4\uC11C\uAD00 \uBD84\uB958
+  // í¼ì¡ëë³ ëìê´ ë¶ë¥
   const congestionCounts = {
-    "\uC5EC\uC720": libraries.filter((l: any) => l.congestionLevel === "\uC5EC\uC720").length,
-    "\uBCF4\uD1B5": libraries.filter((l: any) => l.congestionLevel === "\uBCF4\uD1B5").length,
-    "\uD63C\uC7A1": libraries.filter((l: any) => l.congestionLevel === "\uD63C\uC7A1").length,
+    "ì¬ì ": libraries.filter((l: any) => l.congestionLevel === "ì¬ì ").length,
+    "ë³´íµ": libraries.filter((l: any) => l.congestionLevel === "ë³´íµ").length,
+    "í¼ì¡": libraries.filter((l: any) => l.congestionLevel === "í¼ì¡").length,
   };
 
-  // \uB77C\uC774\uBE0C \uD1B5\uACC4 \uB9C8\uD034
+  const pieData = [
+    { name: "ì¬ì ", value: congestionCounts["ì¬ì "], color: "#22c55e" },
+    { name: "ë³´íµ", value: congestionCounts["ë³´íµ"], color: "#f59e0b" },
+    { name: "í¼ì¡", value: congestionCounts["í¼ì¡"], color: "#ef4444" },
+  ];
+
+  // ë¼ì´ë¸ íµê³ ë§í´
   const liveStats = libraries.slice(0, 6).map((lib: any) => ({
-    icon: lib.congestionLevel === "\uD63C\uC7A1" ? "\uD83D\uDD25" : lib.congestionLevel === "\uBCF4\uD1B5" ? "\u26A0\uFE0F" : "\u2728",
+    icon: lib.congestionLevel === "í¼ì¡" ? "\uD83D\uDD25" : lib.congestionLevel === "ë³´íµ" ? "\u26A0\uFE0F" : "\u2728",
     text: `${lib.name} ${lib.congestionLevel} ${lib.seatUsageRate || 0}%`,
   }));
 
@@ -71,7 +76,7 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-4 py-8 flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-600 font-medium">{"\uB370\uC774\uD130\uB97C \uBD88\uB7EC\uC624\uB294 \uC911..."}</p>
+          <p className="text-slate-600 font-medium">{"ë°ì´í°ë¥¼ ë¶ë¬ì¤ë ì¤..."}</p>
         </div>
       </div>
     );
@@ -79,20 +84,20 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 pb-24 md:pb-8 relative overflow-hidden">
-      {/* Background Effects */}
       <Particles className="absolute inset-0 -z-10" quantity={40} color="#3b82f6" size={0.6} speed={0.15} />
-      {/* \uD5E4\uB354 */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 animate-fade-up">
+
+      {/* í¤ë */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">
             {"\uD83D\uDCCA "}
-            <AnimatedGradientText>{"\uC804\uAD6D \uB3C4\uC11C\uAD00 \uB370\uC774\uD130 \uB300\uC2DC\uBCF4\uB4DC"}</AnimatedGradientText>
+            <AnimatedGradientText>{"ì êµ­ ëìê´ ë°ì´í° ëìë³´ë"}</AnimatedGradientText>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 sm:mt-2">{"\uC804\uAD6D \uACF5\uACF5\uB3C4\uC11C\uAD00\uC758 \uC2E4\uC2DC\uAC04 \uC774\uC6A9 \uD604\uD669\uACFC \uD2B8\uB80C\uB4DC\uB97C \uD55C\uB208\uC5D0"}</p>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1 sm:mt-2">{"ì êµ­ ê³µê³µëìê´ì ì¤ìê° ì´ì© íí©ê³¼ í¸ë ëë¥¼ íëì"}</p>
         </div>
         <div className="flex items-center gap-2 text-xs sm:text-sm text-emerald-600 glass rounded-full px-3 sm:px-4 py-1.5 sm:py-2 self-start sm:self-auto shrink-0">
           <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-          <span className="font-semibold">{"\uC2E4\uC2DC\uAC04 \uC5C5\uB370\uC774\uD2B8 \uC911"}</span>
+          <span className="font-semibold">{"ì¤ìê° ìë°ì´í¸ ì¤"}</span>
         </div>
       </div>
 
@@ -111,7 +116,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* KPI \uCE74\uB4DC */}
+      {/* KPI ì¹´ë */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <MagicCard className="glass p-4 hover:scale-105 transition-all duration-300 shadow-lg shadow-blue-500/10" gradientColor="rgba(37,99,235,0.12)">
           <div className="relative">
@@ -119,54 +124,148 @@ export default function DashboardPage() {
             <div className="flex items-start justify-between mb-3">
               <span className="text-3xl">{"\uD83C\uDFDB\uFE0F"}</span>
             </div>
-            <p className="text-[10px] sm:text-xs textÛ]KMLÛ[YY][HXLHÛNXLÈPÎ
-PQ
-PÐÍPÌLP×PQPÌNOÜÛ\ÜÓ[YOH^[ÈÛN^LÛXÛËYÜYY[]Ë\ÛKXYKMËXYKMÌËXÛ\]^^][Ü\[XLHÛNXL[X\XÚÙ\[YO^ÝÝ[X\Y\ßH[^O^ÌHÏÈPPÌPÈBÜÛ\ÜÓ[YOH^^È^\Û]KMÈPÌMPÌ×PPÌ
-PÍQPÑHPÎLLHOÜÙ]ÓXYÚXÐØ\XYÚXÐØ\Û\ÜÓ[YOHÛ\ÜÈMÝ\ØØ[KLL
-H[Ú][ÛX[\][ÛLÌÚYÝË[ÈÚYÝËY[Y\[MLÌLÜYY[ÛÛÜHØJMN
-KLKLH]Û\ÜÓ[YOH[]]HÜ\X[HÚ^O^ÌLH\][Û^ÌLHÛÛÜÛOHÌLNHÛÛÜÏHÌÍÎNH[^O^ÌHÏ]Û\ÜÓ[YOH^][\Ë\Ý\\ÝYKX]ÙY[XLÈÜ[Û\ÜÓ[YOH^LÞÈQÑQÍHOÜÜ[Ù]Û\ÜÓ[YOH^VÌLHÛN^^È^\Û]KMLÛ[YY][HXLHÛNXLÈQ
-
-PÍÐPÈPÑQPÍÍÍPÍNWPÍÎLOÜÛ\ÜÓ[YOH^[ÈÛN^LÛXÛËYÜYY[]Ë\ÛKY[Y\[MËY[Y\[MÌËXÛ\]^^][Ü\[XLHÛNXL[X\XÚÙ\[YO^ØÝ\[\Ù\ßH[^O^ÍHÏÈPN
-HBÜÛ\ÜÓ[YOH^^È^\Û]KMÈQ
-
-PÍÐPÈPÐÌWPÌLQPÎLLHOÜÙ]ÓXYÚXÐØ\XYÚXÐØ\Û\ÜÓ[YOHÛ\ÜÈMÝ\ØØ[KLL
-H[Ú][ÛX[\][ÛLÌÚYÝË[ÈÚYÝËZ[YÛËMLÌLÜYY[ÛÛÜHØJNKLKLH]Û\ÜÓ[YOH[]]HÜ\X[HÚ^O^ÌLH\][Û^ÌLHÛÛÜÛOHÍÍHÛÛÜÏHØMÎH[^O^ÍHÏ]Û\ÜÓ[YOH^][\Ë\Ý\\ÝYKX]ÙY[XLÈÜ[Û\ÜÓ[YOH^LÞÈQÑQÐÐHOÜÜ[Ù]Û\ÜÓ[YOH^VÌLHÛN^^È^\Û]KMLÛ[YY][HXLHÛNXLÈPÎ
-PQ
-QÐÎWPQLPÍÍÍPÍNWPMOÜÛ\ÜÓ[YOH^[ÈÛN^LÛXÛËYÜYY[]Ë\ÛKZ[YÛËMËZ[YÛËMÌËXÛ\]^^][Ü\[XLHÛNXL[X\XÚÙ\[YO^Ø]\YÙU\ØYÙT]_H[^O^ÍHXÚ[X[XÙ\Ï^Ì_HÏBÜÛ\ÜÓ[YOH^^È^\Û]KMØ]\YÙU\ØYÙT]H
-ÈPÍQP×PÍÌ]\YÙU\ØYÙT]HH
-ÌÈPÑQPHQ
-Ð×PÍÐLH^ÈPÌNPÎLOÜ]Û\ÜÓ[YOH]LÈLKHË\Û]KLÝ[YY[Ý\ÝËZY[]Û\ÜÓ[YOHY[ËYÜYY[]Ë\ÛKZ[YÛËMËZ[YÛËMÌ[Ú][ÛX[\][ÛMLÝ[YY[Ý[O^ÞÈÚY	Ø]\YÙU\ØYÙT]_IX_HÏÙ]Ù]ÓXYÚXÐØ\XYÚXÐØ\Û\ÜÓ[YOHÛ\ÜÈMÝ\ØØ[KLL
-H[Ú][ÛX[\][ÛLÌÚYÝË[ÈÚYÝËX[X\MLÌLÜYY[ÛÛÜHØJ
-KMNLKLH]Û\ÜÓ[YOH[]]HÜ\X[HÚ^O^ÌLH\][Û^ÌMHÛÛÜÛOHÙNYLÛÛÜÏHÙ[^O^ÍHÏ]Û\ÜÓ[YOH^][\Ë\Ý\\ÝYKX]ÙY[XLÈÜ[Û\ÜÓ[YOH^LÞÈQÑQÐHOÜÜ[Ù]Û\ÜÓ[YOH^VÌLHÛN^^È^\Û]KMLÛ[YY][HXLHÛNXLÈPÎ
-PQ
-PÍÎMPÍQP×PÎ×PÌLQOÜÛ\ÜÓ[YOH^[ÈÛN^LÛXÛËYÜYY[]Ë\ÛKX[X\MËX[X\MÌËXÛ\]^^][Ü\[XLHÛNXL[X\XÚÙ\[YO^ÝÝ[]Z[X_H[^O^ÎHÏÈPÌLQBÜÛ\ÜÓ[YOH^^È^\Û]KMÈPÑQ^ÝÝ[ÙX]ËÓØØ[TÝ[Ê
-_^ÈPÌLQPÎLLHOÜÙ]ÓXYÚXÐØ\Ù]ËÊPÐÌQPQPPP×PÈ
-ßB]Û\ÜÓ[YOHÜYÎÜYXÛÛËLØ\MXMËÊQ
-Ð×PÍÐLWPÐÍP
-QÑPÈ
-ßBXYÚXÐØ\Û\ÜÓ[YOHÛ\ÜÈÝ[YLM[[X]KYYK]\ÜYY[ÛÛÜHØJÍËNKÍK
-H]Û\ÜÓ[YOH[]]HÈÛ\ÜÓ[YOHÛXÛ^\Û]KNLXM^[ÈÈQÑQÐÐHHÈQ
-Ð×PÍÐLWPÐÍP
-QÑPÈOÚÏ]Û\ÜÓ[YOHÜYÜYXÛÛËLÈØ\M^XÙ[\]Û\ÜÓ[YOHMÛ\ÜË\ÝXHÝ[Y^]Û\ÜÓ[YOH^LÞÛXÛ^Y[Y\[M[X\XÚÙ\[YO^ØÛÛÙ\Ý[ÛÛÝ[ÖÈPÍQP×PÍÌ_H[^O^ÌHÏÙ]Û\ÜÓ[YOH^^È^\Û]KM]LHÛ[YY][HÈPÍQP×PÍÌOÜÙ]]Û\ÜÓ[YOHMÛ\ÜË\ÝXHÝ[Y^]Û\ÜÓ[YOH^LÞÛXÛ^X[X\M[X\XÚÙ\[YO^ØÛÛÙ\Ý[ÛÛÝ[ÖÈPÑQPH_H[^O^ÍHÏÙ]Û\ÜÓ[YOH^^È^\Û]KM]LHÛ[YY][HÈPÑQPHOÜÙ]]Û\ÜÓ[YOHMÛ\ÜË\ÝXHÝ[Y^]Û\ÜÓ[YOH^LÞÛXÛ^\YM[X\XÚÙ\[YO^ØÛÛÙ\Ý[ÛÛÝ[ÖÈQ
-Ð×PÍÐLH_H[^O^ÍHÏÙ]Û\ÜÓ[YOH^^È^\Û]KM]LHÛ[YY][HÈQ
-Ð×PÍÐLHOÜÙ]Ù]Ù]ÓXYÚXÐØ\ËÊPÎPÌPÍQQPÐÍPÍÍÍPÍNWPM
-ßBÜYÚ[Û\ØYÙK[Ý	
-XYÚXÐØ\Û\ÜÓ[YOHÛ\ÜÈÝ[YLM[[X]KYYK]\ÜYY[ÛÛÜHØJNKLK
-H]Û\ÜÓ[YOH[]]HÈÛ\ÜÓ[YOHÛXÛ^\Û]KNLXM^[ÈÈQÑQWQLHÈPÎPÌPÍQQPÐÍPÍÍÍPÍNWPMOÚÏ\ÜÛÚ]PÛÛZ[\ÚYHL	HZYÚ^ÌÌO\Ú\]O^ÜYÚ[Û\ØYÙ_HX\Ú[^ÞÈÜ
-KYÚLYLLÝÛN_OØ\\ÚX[ÜYÝÚÙQ\Ú\^OHÈÈÝÚÙOHØJLLMLÎKJHÏ^\È]RÙ^OHYÚ[ÛÝÚÙOHÍ
-ÍÝ[O^ÞÈÛÚ^NL_H[ÛO^ËM
-_H^[ÚÜH[[\[^ÌHZYÚ^ÍLHÏP^\ÈÝÚÙOHÍ
-ÍÝ[O^ÞÈÛÚ^NL_HÏÛÛ\ÛÛ[Ý[O^ÞÈXÚÙÜÝ[ØJMKMKMKMJHÜ\\ÛÛYØJLLMLÎKHÜ\Y]\ÎLÞÚYÝÎ
-ØJJH_HÏ\]RÙ^OH\ØYÙT]HY]\Ï^ÖÌLL_OÜYÚ[Û\ØYÙKX\
+            <p className="text-xs text-slate-500 mb-1">{"ì´ ëìê´"}</p>
+            <p className="text-2xl font-bold text-slate-900">
+              <NumberTicker value={totalLibraries} />
+            </p>
+          </div>
+        </MagicCard>
 
-[K[^
-HO
-Ù[Ù^O^ØÙ[IÚ[^XH[^Ù[K\ØYÙT]H
-ÌÈÙY
+        <MagicCard className="glass p-4 hover:scale-105 transition-all duration-300 shadow-lg shadow-violet-500/10" gradientColor="rgba(139,92,246,0.12)">
+          <div className="relative">
+            <BorderBeam size={120} duration={8} colorFrom="#8b5cf6" colorTo="#d946ef" />
+            <div className="flex items-start justify-between mb-3">
+              <span className="text-3xl">{"\uD83D\uDC65"}</span>
+            </div>
+            <p className="text-xs text-slate-500 mb-1">{"íì¬ ì´ì©ì"}</p>
+            <p className="text-2xl font-bold text-slate-900">
+              <NumberTicker value={currentUsers} />
+            </p>
+          </div>
+        </MagicCard>
 
+        <MagicCard className="glass p-4 hover:scale-105 transition-all duration-300 shadow-lg shadow-amber-500/10" gradientColor="rgba(245,158,11,0.12)">
+          <div className="relative">
+            <BorderBeam size={120} duration={8} colorFrom="#f59e0b" colorTo="#ef4444" />
+            <div className="flex items-start justify-between mb-3">
+              <span className="text-3xl">{"\uD83D\uDCCA"}</span>
+            </div>
+            <p className="text-xs text-slate-500 mb-1">{"íê·  ì´ì©ë¥ "}</p>
+            <p className="text-2xl font-bold text-slate-900">
+              <NumberTicker value={averageUsageRate} />%
+            </p>
+          </div>
+        </MagicCard>
 
-[K\ØYÙT]H
-LÈÙNYLÌÍMYHHÏ
-J_BÐ\Ð\Ú\Ô\ÜÛÚ]PÛÛZ[\Ù]ÓXYÚXÐØ\
-_BÙ]Ù]
-NÂB
+        <MagicCard className="glass p-4 hover:scale-105 transition-all duration-300 shadow-lg shadow-emerald-500/10" gradientColor="rgba(16,185,129,0.12)">
+          <div className="relative">
+            <BorderBeam size={120} duration={8} colorFrom="#10b981" colorTo="#06b6d4" />
+            <div className="flex items-start justify-between mb-3">
+              <span className="text-3xl">{"\u2705"}</span>
+            </div>
+            <p className="text-xs text-slate-500 mb-1">{"ì´ì© ê°ë¥ ì¢ì­"}</p>
+            <p className="text-2xl font-bold text-slate-900">
+              <NumberTicker value={totalAvailable} />
+            </p>
+          </div>
+        </MagicCard>
+      </div>
+
+      {/* ì°¨í¸ ìì­ */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* ì§ì­ë³ ì´ì©ë¥  */}
+        <div className="glass rounded-2xl p-6">
+          <h2 className="text-lg font-bold text-slate-800 mb-4">{"ì§ì­ë³ ì´ì©ë¥ "}</h2>
+          {regionUsage.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={regionUsage}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="region" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip />
+                <Bar dataKey="usageRate" name="ì´ì©ë¥ (%)" radius={[6, 6, 0, 0]}>
+                  {regionUsage.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={getCongestionHex(entry.usageRate)} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-slate-400 text-center py-12">{"ë°ì´í° ìì"}</p>
+          )}
+        </div>
+
+        {/* í¼ì¡ë ë¶í¬ */}
+        <div className="glass rounded-2xl p-6">
+          <h2 className="text-lg font-bold text-slate-800 mb-4">{"í¼ì¡ë ë¶í¬"}</h2>
+          {pieData.some((d) => d.value > 0) ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={4}
+                  dataKey="value"
+                  label={({ name, value }) => `${name} ${value}`}
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`pie-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-slate-400 text-center py-12">{"ë°ì´í° ìì"}</p>
+          )}
+        </div>
+      </div>
+
+      {/* ëìê´ ëª©ë¡ */}
+      <div className="glass rounded-2xl p-6">
+        <h2 className="text-lg font-bold text-slate-800 mb-4">{"ëìê´ íí©"}</h2>
+        {libraries.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-200">
+                  <th className="text-left py-3 px-2 text-slate-500 font-medium">{"ëìê´"}</th>
+                  <th className="text-center py-3 px-2 text-slate-500 font-medium">{"í¼ì¡ë"}</th>
+                  <th className="text-right py-3 px-2 text-slate-500 font-medium">{"ì´ì©ë¥ "}</th>
+                  <th className="text-right py-3 px-2 text-slate-500 font-medium">{"ìì¬ì"}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {libraries.slice(0, 20).map((lib: any, i: number) => (
+                  <tr key={i} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                    <td className="py-2.5 px-2 font-medium text-slate-800 truncate max-w-[200px]">{lib.name}</td>
+                    <td className="py-2.5 px-2 text-center">
+                      <span
+                        className={cn(
+                          "px-2 py-0.5 rounded-full text-xs font-semibold",
+                          lib.congestionLevel === "ì¬ì " && "bg-green-100 text-green-700",
+                          lib.congestionLevel === "ë³´íµ" && "bg-amber-100 text-amber-700",
+                          lib.congestionLevel === "í¼ì¡" && "bg-red-100 text-red-700"
+                        )}
+                      >
+                        {lib.congestionLevel || "-"}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-2 text-right text-slate-600">{lib.seatUsageRate || 0}%</td>
+                    <td className="py-2.5 px-2 text-right text-slate-600">{lib.totalAvailable || 0}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-slate-400 text-center py-8">{"ëìê´ ë°ì´í°ê° ììµëë¤"}</p>
+        )}
+      </div>
+    </div>
+  );
+}
