@@ -53,6 +53,11 @@ export async function GET(request: NextRequest) {
           infoError: infoRes.status === "rejected" ? String(infoRes.reason) : null,
           statusError: statusRes.status === "rejected" ? String(statusRes.reason) : null,
           realtimeError: realtimeRes.status === "rejected" ? String(realtimeRes.reason) : null,
+          infoItemCount: info.items.length,
+          statusItemCount: status.items.length,
+          realtimeItemCount: realtime.items.length,
+          apiKeySet: !!process.env.DATA_GO_KR_API_KEY,
+          apiKeyPrefix: process.env.DATA_GO_KR_API_KEY ? process.env.DATA_GO_KR_API_KEY.substring(0, 8) + "..." : "none",
         },
       });
     }
