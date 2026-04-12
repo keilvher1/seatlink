@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from "react";
-import { mockLibraries } from "@/lib/mock-data";
 import { getCongestionColor, cn } from "@/lib/utils";
 import { LibraryWithDistance } from "@/lib/types";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
@@ -16,10 +15,24 @@ export default function HomePage() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
   const [locationLoading, setLocationLoading] = useState(true);
+  const [libraries, setLibraries] = useState<any[]>([]);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapObjRef = useRef<any>(null);
   const markerLayerRef = useRef<any>(null);
   const userMarkerRef = useRef<any>(null);
+
+  useEffect(() => {
+    const fetchLibraries = async () => {
+      try {
+        const res = await fetch("/api/libraries");
+        const data = await res.json();
+        setLibraries(data.libraries || []);
+      } catch (err) {
+        console.error("Failed to fetch libraries:", err);
+      }
+    };
+    fetchLibraries();
+  }, []);
 
   // Haversine formula to calculate distance between two coordinates
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -45,7 +58,7 @@ export default function HomePage() {
   const sorted = useMemo(() => {
     if (!userPos) return [];
     
-    const list = mockLibraries.map((lib) => {
+    const list = libraries.map((lib) => {
       const distance = calculateDistance(userPos[0], userPos[1], lib.lat, lib.lng);
       return {
         ...lib,
@@ -57,7 +70,7 @@ export default function HomePage() {
     if (sortBy === "seats") list.sort((a, b) => b.totalAvailable - a.totalAvailable);
     else list.sort((a, b) => a.distance - b.distance);
     return list;
-  }, [radius, sortBy, userPos]);
+  }, [radius, sortBy, userPos, libraries]);
 
   const requestGeolocation = () => {
     if ("geolocation" in navigator) {
