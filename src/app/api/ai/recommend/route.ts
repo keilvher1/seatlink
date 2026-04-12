@@ -1,6 +1,5 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { streamText } from "ai";
-import { mockLibraries } from "@/lib/mock-data";
 
 export const runtime = "edge";
 
@@ -12,23 +11,29 @@ const gateway = createOpenAI({
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  const libraryContext = mockLibraries.map(function(lib) {
-    const rooms = lib.rooms.map(function(r) {
-      return "  - " + r.name + ": " + r.totalSeats + " seats, " + r.availableSeats + " available (" + r.congestionLevel + ")";
-    }).join("\n");
+  // Fetch real library data from API
+  let allLibraries: any[] = [];
+  try {
+    const origin = new URL(req.url).origin;
+    const res = await fetch(`${origin}/api/libraries`, { cache: "no-store" });
+    const data = await res.json();
+    allLibraries = data.libraries || [];
+  } catch (err) {
+    console.error("[AI Recommend] Failed to fetch libraries:", err);
+  }
+
+  const libraryContext = allLibraries.map(function(lib: any) {
     const facilities = [
       lib.wifi ? "WiFi" : "",
       lib.parking ? "Parking" : "",
       lib.nightOperation ? "Night" : "",
       lib.reservable ? "Reservable" : "",
     ].filter(Boolean).join(", ");
-    return lib.name + " (" + lib.id + ")\n" +
-      "  Address: " + lib.address + "\n" +
-      "  Congestion: " + lib.congestionLevel + " (" + lib.seatUsageRate + "%)\n" +
-      "  Hours: Weekday " + lib.operatingHours.weekday + ", Sat " + lib.operatingHours.saturday + "\n" +
+    return lib.name + " (" + (lib.id || "") + ")\n" +
+      "  Address: " + (lib.address || "") + "\n" +
+      "  Congestion: " + (lib.congestionLevel || "") + " (" + (lib.seatUsageRate || 0) + "%)\n" +
       "  Facilities: " + facilities + "\n" +
-      "  Seats: " + lib.totalSeats + " total, " + lib.totalUsed + " used, " + lib.totalAvailable + " available\n" +
-      "  Rooms:\n" + rooms;
+      "  Seats: " + (lib.totalSeats || 0) + " total, " + (lib.totalUsed || 0) + " used, " + (lib.totalAvailable || 0) + " available";
   }).join("\n\n");
 
   const systemPrompt = [
@@ -59,4 +64,3 @@ export async function POST(req: Request) {
 
   return result.toDataStreamResponse();
 }
-
