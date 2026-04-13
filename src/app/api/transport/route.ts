@@ -212,47 +212,57 @@ export async function GET(request: NextRequest) {
           const vehicles =
             vehiclesRes.status === "fulfilled" ? vehiclesRes.value.items : [];
 
-          // 차량 현황 Map
+          // 차량 이용가능 현황 Map (cntrId 기준)
           const vehicleMap = new Map<string, any>();
           for (const v of vehicles) {
-            const cId = v.centerId || v.cntrId || v.lcgvmnInstCd || "";
+            const cId = v.cntrId || "";
             if (cId) vehicleMap.set(cId, v);
           }
 
+          console.log(`[Transport] Accessible raw: ${centers.length} centers, ${vehicles.length} vehicle records`);
+
           const nearbyCenters = centers
             .map((c: any) => {
-              const lat = parseFloat(c.lat || c.la || c.latitude || "0");
-              const lng = parseFloat(
-                c.lot || c.lo || c.lng || c.longitude || "0"
-              );
+              const lat = parseFloat(c.lat || "0");
+              const lng = parseFloat(c.lot || "0");
 
               const dist =
                 lat && lng
                   ? haversineDistance(userLat, userLng, lat, lng)
                   : Infinity;
 
-              const cId = c.centerId || c.cntrId || c.lcgvmnInstCd || "";
+              const cId = c.cntrId || "";
               const vInfo = vehicleMap.get(cId);
 
+              // 대기건수로 예상 대기시간 추정 (건당 약 5분)
+              const waitCount = parseInt(vInfo?.wtngNocs || "0") || 0;
+              const estimatedWait = Math.max(10, waitCount * 5);
+
               return {
-                centerName:
-                  c.centerNm || c.cntrNm || c.instNm || "이동지원센터",
+                centerName: c.cntrNm || "이동지원센터",
+                centerId: cId,
+                region: c.lclgvNm || "",
                 lat: lat || 0,
                 lng: lng || 0,
                 distance: Math.round(dist * 10) / 10,
                 totalVehicles:
-                  parseInt(vInfo?.vhclTotCnt || vInfo?.totalVehicleCo || c.vhclCnt || "0") || 0,
+                  parseInt(vInfo?.tvhclCntom || c.hldVhclTcntom || "0") || 0,
+                operatingVehicles:
+                  parseInt(vInfo?.oprVhclCntom || "0") || 0,
                 availableVehicles:
-                  parseInt(
-                    vInfo?.oprtVhclCnt || vInfo?.operVehicleCo || "0"
-                  ) || 0,
-                phone: c.telno || c.phoneNumber || "",
-                estimatedWait: 30, // 기본값 (실시간 대기 정보 API 없음)
+                  parseInt(vInfo?.avlVhclCntom || "0") || 0,
+                reservations: parseInt(vInfo?.rsvtNocs || "0") || 0,
+                waitingCount: waitCount,
+                estimatedWait,
+                phone: c.cntrTelno || "",
+                appName: c.appSrvcNm || "",
+                operatingArea: c.wtjrOprRgnNm || "",
+                lastUpdated: vInfo?.totDt || "",
               };
             })
             .filter((c: any) => c.distance <= radius * 5) // 넓은 반경
             .sort((a: any, b: any) => a.distance - b.distance)
-            .slice(0, 3);
+            .slice(0, 5);
 
           result.accessibleTransport =
             nearbyCenters.length > 0 ? nearbyCenters : null;

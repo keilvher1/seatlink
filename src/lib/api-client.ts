@@ -97,16 +97,26 @@ export async function fetchPublicAPI<T = any>(
       return { items: [], totalCount: 0, error: "JSON parse failed" };
     }
 
+    // 구조 1: { response: { header, body: { items } } } — 도서관 API 등
     const header = data?.response?.header;
     if (header && header.resultCode && header.resultCode !== "00" && header.resultCode !== "0000") {
       console.error(`[API] API Error: code=${header.resultCode}`);
       return { items: [], totalCount: 0, error: `API code ${header.resultCode}` };
     }
 
-    const body = data?.response?.body;
+    // 구조 2: { header: { resultCode }, body: { item } } — 교통약자 API 등
+    const header2 = data?.header;
+    if (header2 && header2.resultCode && header2.resultCode !== "K0" && header2.resultCode !== "00" && header2.resultCode !== "0000") {
+      console.error(`[API] API Error (v2): code=${header2.resultCode}, msg=${header2.resultMsg}`);
+      return { items: [], totalCount: 0, error: `API code ${header2.resultCode}: ${header2.resultMsg}` };
+    }
+
+    // body 추출: response.body 또는 직접 body
+    const body = data?.response?.body || data?.body;
     if (body) {
       let items: any[];
-      const rawItems = body.items;
+      // items 또는 item 필드 탐색
+      const rawItems = body.items ?? body.item;
 
       if (rawItems === null || rawItems === undefined || rawItems === "") {
         items = [];
