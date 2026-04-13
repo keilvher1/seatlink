@@ -17,11 +17,14 @@ export default function HomePage() {
   const [locationLoading, setLocationLoading] = useState(true);
   const [libraries, setLibraries] = useState<any[]>([]);
   const [buses, setBuses] = useState<any[]>([]);
+  const [bikes, setBikes] = useState<any[]>([]);
   const [showBuses, setShowBuses] = useState(true);
+  const [showBikes, setShowBikes] = useState(true);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapObjRef = useRef<any>(null);
   const markerLayerRef = useRef<any>(null);
   const busLayerRef = useRef<any>(null);
+  const bikeLayerRef = useRef<any>(null);
   const userMarkerRef = useRef<any>(null);
 
   useEffect(() => {
@@ -51,6 +54,23 @@ export default function HomePage() {
     };
     fetchBuses();
     const interval = setInterval(fetchBuses, 30000);
+    return () => clearInterval(interval);
+  }, [userPos, radius]);
+
+  // 공영자전거 대여소 가져오기 (60초 간격 새로고침)
+  useEffect(() => {
+    if (!userPos) return;
+    const fetchBikes = async () => {
+      try {
+        const res = await fetch(`/api/bike-realtime?lat=${userPos[0]}&lng=${userPos[1]}&radius=${radius}`);
+        const data = await res.json();
+        setBikes(data.bikes || []);
+      } catch (err) {
+        console.error("Failed to fetch bikes:", err);
+      }
+    };
+    fetchBikes();
+    const interval = setInterval(fetchBikes, 60000);
     return () => clearInterval(interval);
   }, [userPos, radius]);
 
@@ -172,6 +192,7 @@ export default function HomePage() {
       userMarkerRef.current = userMarker;
       markerLayerRef.current = L.layerGroup().addTo(map);
       busLayerRef.current = L.layerGroup().addTo(map);
+      bikeLayerRef.current = L.layerGroup().addTo(map);
       mapObjRef.current = map;
       updateMarkers(L);
       setTimeout(() => {
@@ -262,6 +283,47 @@ export default function HomePage() {
     updateBusMarkers();
   }, [buses, showBuses]);
 
+  // 자전거 마커 업데이트
+  const updateBikeMarkers = async (LParam?: any) => {
+    const L = LParam || (await import("leaflet")).default;
+    if (!bikeLayerRef.current) return;
+    bikeLayerRef.current.clearLayers();
+
+    if (!showBikes) return;
+
+    bikes.forEach((bike: any) => {
+      const bikeColor = bike.availableBikes > 5 ? "#22c55e" : bike.availableBikes > 0 ? "#f59e0b" : "#ef4444";
+      const icon = L.divIcon({
+        html: `<div style="display:flex;flex-direction:column;align-items:center;">
+          <div style="width:30px;height:30px;background:${bikeColor};border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 2px 6px ${bikeColor}88;">
+            <span style="font-size:13px;">🚲</span>
+          </div>
+          <div style="background:white;padding:0px 4px;border-radius:4px;margin-top:1px;box-shadow:0 1px 3px rgba(0,0,0,0.15);">
+            <span style="font-size:9px;font-weight:700;color:${bikeColor};">${bike.availableBikes}대</span>
+          </div>
+        </div>`,
+        className: "", iconSize: [50, 45], iconAnchor: [25, 30],
+      });
+      const marker = L.marker([bike.lat, bike.lng], { icon }).addTo(bikeLayerRef.current);
+      marker.bindPopup(`
+        <div style="font-size:13px;min-width:160px;">
+          <b style="font-size:14px;">🚲 ${bike.name}</b><br/>
+          <span style="color:#22c55e;font-weight:bold;">대여 가능: ${bike.availableBikes}대</span><br/>
+          ${bike.address ? `<span style="font-size:11px;color:#666;">📍 ${bike.address}</span><br/>` : ''}
+          <span style="font-size:11px;">📏 ${bike.distance}km</span>
+          ${bike.feeType ? ` · <span style="font-size:11px;">${bike.feeType}</span>` : ''}
+          ${bike.region ? `<br/><span style="font-size:11px;">📌 ${bike.region}</span>` : ''}
+        </div>
+      `);
+    });
+  };
+
+  // 자전거 마커 업데이트 effect
+  useEffect(() => {
+    if (!mapObjRef.current) return;
+    updateBikeMarkers();
+  }, [bikes, showBikes]);
+
   // 반경·도서관목록·위치 변경 시 마커 업데이트 + 지도 줌 조정
   useEffect(() => {
     if (!mapObjRef.current || !userPos) return;
@@ -339,22 +401,39 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* Bus toggle button */}
-        <button
-          className={cn(
-            "absolute top-4 right-4 px-3 py-2 rounded-full backdrop-blur-md z-[1000] flex items-center gap-1.5 text-sm font-semibold transition-all duration-300 shadow-md",
-            showBuses
-              ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-emerald-500/30"
-              : "bg-white/80 text-slate-500 hover:shadow-lg"
-          )}
-          onClick={() => setShowBuses(!showBuses)}
-        >
-          <span>{"🚌"}</span>
-          <span>{showBuses ? "버스 ON" : "버스 OFF"}</span>
-          {showBuses && buses.length > 0 && (
-            <span className="px-1.5 py-0.5 bg-white/30 rounded-full text-xs">{buses.length}</span>
-          )}
-        </button>
+        {/* Transport toggle buttons */}
+        <div className="absolute top-4 right-4 flex flex-col gap-2 z-[1000]">
+          <button
+            className={cn(
+              "px-3 py-2 rounded-full backdrop-blur-md flex items-center gap-1.5 text-sm font-semibold transition-all duration-300 shadow-md",
+              showBuses
+                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-emerald-500/30"
+                : "bg-white/80 text-slate-500 hover:shadow-lg"
+            )}
+            onClick={() => setShowBuses(!showBuses)}
+          >
+            <span>{"🚌"}</span>
+            <span>{showBuses ? "버스" : "버스"}</span>
+            {showBuses && buses.length > 0 && (
+              <span className="px-1.5 py-0.5 bg-white/30 rounded-full text-xs">{buses.length}</span>
+            )}
+          </button>
+          <button
+            className={cn(
+              "px-3 py-2 rounded-full backdrop-blur-md flex items-center gap-1.5 text-sm font-semibold transition-all duration-300 shadow-md",
+              showBikes
+                ? "bg-gradient-to-r from-orange-400 to-amber-500 text-white shadow-orange-400/30"
+                : "bg-white/80 text-slate-500 hover:shadow-lg"
+            )}
+            onClick={() => setShowBikes(!showBikes)}
+          >
+            <span>{"🚲"}</span>
+            <span>{showBikes ? "자전거" : "자전거"}</span>
+            {showBikes && bikes.length > 0 && (
+              <span className="px-1.5 py-0.5 bg-white/30 rounded-full text-xs">{bikes.length}</span>
+            )}
+          </button>
+        </div>
 
         {/* My location button */}
         <button
