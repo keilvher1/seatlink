@@ -94,7 +94,7 @@ export default function HomePage() {
           setUserPos([latitude, longitude]);
           setLocationLoading(false);
           if (mapObjRef.current) {
-            mapObjRef.current.setView([latitude, longitude], 12);
+            // 줌 레벨은 useEffect에서 반경에 맞게 조정하므로 여기서는 위치만 업데이트
             updateUserMarker([latitude, longitude]);
           }
         },
@@ -153,7 +153,13 @@ export default function HomePage() {
       markerLayerRef.current = L.layerGroup().addTo(map);
       mapObjRef.current = map;
       updateMarkers(L);
-      setTimeout(() => map.invalidateSize(), 100);
+      setTimeout(() => {
+        map.invalidateSize();
+        // 초기화 완료 후 반경에 맞게 줌 조정
+        const radiusToZoom: Record<number, number> = { 5: 13, 10: 12, 30: 10, 100: 8 };
+        const zoom = radiusToZoom[radius] || 10;
+        map.setView(userPos, zoom, { animate: false });
+      }, 150);
     };
 
     if (!document.getElementById("leaflet-css")) {
@@ -212,7 +218,7 @@ export default function HomePage() {
     } else {
       // fallback(반경 내 도서관 없음)이거나 결과 없으면 유저 위치 중심으로 줌
       console.log("[MAP] setView to", userPos, "zoom:", zoom);
-      mapObjRef.current.setView(userPos, zoom, { animate: true });
+      mapObjRef.current.setView(userPos, zoom, { animate: true, duration: 0.5 });
     }
   }, [radius, sorted, userPos, isFallback]);
 
