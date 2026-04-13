@@ -4,6 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
  * 공영자전거 실시간 API
  * 전국 공영자전거 대여소 위치 + 대여 가능 자전거 수
  *
+ * - 대여소 위치 정보: 서버 메모리 캐시 (5분 TTL)
+ * - 대여 가능 현황: 매 요청 시 조회 (1분 캐시)
+ * - data.go.kr API는 numOfRows 최대 1000이므로 페이지네이션 필요
+ *
  * Query params:
  *   lat, lng  — 사용자 좌표 (필수)
  *   radius    — 반경 km (기본 5)
@@ -21,37 +25,95 @@ function haversine(lat1: number, lon1: number, lat2: number, lon2: number): numb
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-async function fetchBikeAPI(endpoint: string, params: Record<string, string> = {}) {
+// ── 서버 메모리 캐시 ──
+let stationCache: any[] = [];
+let stationCacheTime = 0;
+const STATION_CACHE_TTL = 5 * 60 * 1000; // 5분
+
+let availCache: Map<string, number> = new Map();
+let availCacheTime = 0;
+const AVAIL_CACHE_TTL = 60 * 1000; // 1분
+
+async function fetchPage(endpoint: string, pageNo: number) {
   const apiKey = process.env.DATA_GO_KR_API_KEY;
-  if (!apiKey) return { items: [], totalCount: 0 };
+  if (!apiKey) return [];
 
   const encodedKey = apiKey.includes("%") ? apiKey : encodeURIComponent(apiKey);
-  const query = new URLSearchParams({ pageNo: "1", numOfRows: "5000", type: "json", ...params });
+  const query = new URLSearchParams({
+    pageNo: String(pageNo),
+    numOfRows: "1000",
+    type: "json",
+  });
   const url = `${BIKE_API_BASE}${endpoint}?serviceKey=${encodedKey}&${query.toString()}`;
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 20000);
+    const timeout = setTimeout(() => controller.abort(), 15000);
     const res = await fetch(url, { signal: controller.signal, headers: { Accept: "application/json" } });
     clearTimeout(timeout);
 
     const text = await res.text();
-    if (text.startsWith("<") || text.startsWith("<?xml")) {
-      console.error(`[BikeAPI] XML error from ${endpoint}`);
-      return { items: [], totalCount: 0 };
-    }
+    if (text.startsWith("<")) return [];
 
     const data = JSON.parse(text);
     const body = data?.response?.body || data?.body;
-    if (!body) return { items: [], totalCount: 0 };
+    if (!body) return [];
 
     const rawItems = body.items?.item ?? body.items ?? body.item ?? [];
-    const items = Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
-    return { items, totalCount: parseInt(body.totalCount) || items.length };
+    return Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
   } catch (err: any) {
-    console.error(`[BikeAPI] Error fetching ${endpoint}:`, err.message);
-    return { items: [], totalCount: 0 };
+    console.error(`[BikeAPI] Page ${pageNo} error:`, err.message);
+    return [];
   }
+}
+
+async function getAllStations(): Promise<any[]> {
+  const now = Date.now();
+  if (stationCache.length > 0 && (now - stationCacheTime) < STATION_CACHE_TTL) {
+    return stationCache;
+  }
+
+  console.log("[BikeAPI] Refreshing station cache...");
+  // 전국 약 6253개 → 7페이지 병렬 호출
+  const pages = await Promise.all(
+    Array.from({ length: 7 }, (_, i) => fetchPage("/inf_101_00010001_v2", i + 1))
+  );
+  const allStations = pages.flat();
+
+  if (allStations.length > 0) {
+    stationCache = allStations;
+    stationCacheTime = now;
+    console.log(`[BikeAPI] Cached ${allStations.length} stations`);
+  }
+
+  return stationCache;
+}
+
+async function getAvailability(): Promise<Map<string, number>> {
+  const now = Date.now();
+  if (availCache.size > 0 && (now - availCacheTime) < AVAIL_CACHE_TTL) {
+    return availCache;
+  }
+
+  console.log("[BikeAPI] Refreshing availability...");
+  const pages = await Promise.all(
+    Array.from({ length: 6 }, (_, i) => fetchPage("/inf_101_00010002_v2", i + 1))
+  );
+  const allAvail = pages.flat();
+
+  const newMap = new Map<string, number>();
+  for (const a of allAvail) {
+    const id = a.rntstnId || "";
+    if (id) newMap.set(id, parseInt(a.bcyclTpkctNocs || "0") || 0);
+  }
+
+  if (newMap.size > 0) {
+    availCache = newMap;
+    availCacheTime = now;
+    console.log(`[BikeAPI] Cached availability for ${newMap.size} stations`);
+  }
+
+  return availCache;
 }
 
 export async function GET(request: NextRequest) {
@@ -73,23 +135,12 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // 대여소 정보 + 가용 현황 병렬 호출
-    const [stationResult, availResult] = await Promise.all([
-      fetchBikeAPI("/inf_101_00010001_v2"),
-      fetchBikeAPI("/inf_101_00010002_v2"),
+    const [stations, availMap] = await Promise.all([
+      getAllStations(),
+      getAvailability(),
     ]);
 
-    // 가용 현황 Map: rntstnId -> bcyclTpkctNocs
-    const availMap = new Map<string, number>();
-    for (const a of availResult.items) {
-      const id = a.rntstnId || "";
-      if (id) {
-        availMap.set(id, parseInt(a.bcyclTpkctNocs || "0") || 0);
-      }
-    }
-
-    // 사용자 주변 대여소 필터링
-    const nearbyBikes = stationResult.items
+    const nearbyBikes = stations
       .map((station: any) => {
         const lat = parseFloat(station.lat || "0");
         const lng = parseFloat(station.lot || "0");
@@ -109,22 +160,21 @@ export async function GET(request: NextRequest) {
           availableBikes,
           address: station.roadNmAddr || station.lotnoAddr || "",
           region: station.lcgvmnInstNm || "",
-          facilityType: station.rntstnFcltTypeNm || "",
           feeType: station.rntFeeTypeNm || "",
           distance: Math.round(dist * 100) / 100,
         };
       })
       .filter(Boolean)
       .sort((a: any, b: any) => a.distance - b.distance)
-      .slice(0, 30); // 최대 30개 대여소
+      .slice(0, 30);
 
     return NextResponse.json({
       bikes: nearbyBikes,
-      totalStations: stationResult.totalCount,
+      totalStations: stations.length,
       source: "api",
       updatedAt: new Date().toISOString(),
     }, {
-      headers: { "Cache-Control": "public, max-age=60, stale-while-revalidate=120" },
+      headers: { "Cache-Control": "public, max-age=30, stale-while-revalidate=60" },
     });
   } catch (error: any) {
     console.error("[BikeAPI] Fatal:", error.message);
@@ -153,7 +203,6 @@ function getMockBikes(lat: number, lng: number) {
     availableBikes: o.bikes,
     address: "",
     region: "",
-    facilityType: "무인",
     feeType: "유료",
     distance: Math.round(haversine(lat, lng, lat + o.dlat, lng + o.dlng) * 100) / 100,
   }));
