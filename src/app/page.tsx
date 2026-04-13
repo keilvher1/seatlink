@@ -211,14 +211,15 @@ export default function HomePage() {
 
     console.log("[MAP] radius:", radius, "zoom:", zoom, "sorted:", sorted.length, "isFallback:", isFallback);
 
+    const map = mapObjRef.current;
     if (sorted.length > 0 && !isFallback) {
       // 반경 내 도서관이 있으면 마커 + 유저 위치가 모두 보이도록 fitBounds
       const points: [number, number][] = [[userPos[0], userPos[1]], ...sorted.map((l: any) => [l.lat, l.lng] as [number, number])];
-      mapObjRef.current.fitBounds(points, { padding: [50, 50], maxZoom: zoom, animate: true });
+      map.fitBounds(points, { padding: [50, 50], maxZoom: zoom, animate: true });
     } else {
       // fallback(반경 내 도서관 없음)이거나 결과 없으면 유저 위치 중심으로 줌
-      console.log("[MAP] flyTo", userPos, "zoom:", zoom);
-      mapObjRef.current.flyTo(userPos, zoom, { duration: 0.8 });
+      console.log("[MAP] setZoom", zoom, "current:", map.getZoom());
+      map.setZoom(zoom, { animate: true });
     }
   }, [radius, sorted, userPos, isFallback]);
 
