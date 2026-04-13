@@ -257,7 +257,7 @@ export async function GET(request: NextRequest) {
 }
 
 
-function getMockLibraries(): Library[] {
+function getMockLibraries() {
   const now = new Date().toISOString();
   return [
     // ========== 서울특별시 ==========
