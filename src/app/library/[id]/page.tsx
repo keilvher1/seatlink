@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
-import { getCongestionColor, getCongestionHex, cn } from "@/lib/utils";
+import { getCongestionColor, getCongestionHex, cn, formatOperatingTime, formatApiDateTime } from "@/lib/utils";
 import { MagicCard } from "@/components/magicui/magic-card";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { NumberTicker } from "@/components/magicui/number-ticker";
@@ -85,7 +85,7 @@ export default function LibraryDetailPage() {
         <div className="px-4 py-5 space-y-3 relative">
           <BorderBeam size={200} duration={16} colorFrom="#2563eb" colorTo="#a855f7" />
           <p className="text-sm text-slate-700 font-medium">{"\uD83D\uDCCD"} {library.address}</p>
-          <p className="text-sm text-slate-700 font-medium">{"\uD83D\uDD50"} {library.operatingHours?.weekday || "N/A"}
+          <p className="text-sm text-slate-700 font-medium">{"\uD83D\uDD50"} {formatOperatingTime(library.operatingHours?.weekday || "N/A")}
             {library.nightOperation && <span className="ml-2 px-2.5 py-0.5 badge-success text-xs">{"\uD83C\uDF19 \uC57C\uAC04\uC6B4\uC601"}</span>}
           </p>
           <p className="text-sm text-slate-700 font-medium">{"\u260E\uFE0F"} {library.phone}</p>
@@ -169,7 +169,7 @@ function RoomStatusTab({ library }: { library: any }) {
                 <span className="text-slate-600 font-medium">{"\uC0AC\uC6A9"} {room.usedSeats}{"\uC11D"} / {"\uCD1D"} {room.totalSeats}{"\uC11D"}</span>
                 <span className={cn("font-bold text-lg", color.text)}>{"\uC794\uC5EC"} <NumberTicker value={room.availableSeats} delay={idx * 200} />{"\uC11D"}</span>
               </div>
-              <p className="text-xs text-slate-500 mt-2">{"\uB9C8\uC9C0\uB9C9 \uC5C5\uB370\uC774\uD2B8: "}{room.lastUpdated}</p>
+              <p className="text-xs text-slate-500 mt-2">{"\uB9C8\uC9C0\uB9C9 \uC5C5\uB370\uC774\uD2B8: "}{formatApiDateTime(room.lastUpdated)}</p>
             </div>
           </MagicCard>
         );

@@ -59,3 +59,22 @@ export function formatDistance(km: number): string {
 export function estimateTravelTime(km: number): number {
   return Math.round((km / 4) * 60);
 }
+
+/** 운영시간 포맷 변환: "090000" → "09:00", "090000~210000" → "09:00~21:00" */
+export function formatOperatingTime(raw: string): string {
+  if (!raw) return "N/A";
+  return raw.replace(/(\d{2})(\d{2})\d{2}/g, "$1:$2");
+}
+
+/** API 날짜시간 포맷: "20260413223700" → "22:37", "20260413" → "04/13" */
+export function formatApiDateTime(raw: string): string {
+  if (!raw || raw.length < 8) return raw || "";
+  if (raw.length >= 12) {
+    const hh = raw.substring(8, 10);
+    const mm = raw.substring(10, 12);
+    return `${hh}:${mm}`;
+  }
+  const mm = raw.substring(4, 6);
+  const dd = raw.substring(6, 8);
+  return `${mm}/${dd}`;
+}
