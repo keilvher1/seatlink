@@ -58,14 +58,16 @@ export default function HomePage() {
   const sorted = useMemo(() => {
     if (!userPos) return [];
     
-    const list = libraries.map((lib) => {
-      const distance = calculateDistance(userPos[0], userPos[1], lib.lat, lib.lng);
-      return {
-        ...lib,
-        distance,
-        distanceText: getDistanceText(distance),
-      };
-    }).filter((l) => l.distance <= radius);
+    const list = libraries
+      .filter((lib) => lib.lat && lib.lng && lib.lat !== 0 && lib.lng !== 0)
+      .map((lib) => {
+        const distance = calculateDistance(userPos[0], userPos[1], lib.lat, lib.lng);
+        return {
+          ...lib,
+          distance,
+          distanceText: getDistanceText(distance),
+        };
+      }).filter((l) => l.distance <= radius && isFinite(l.distance));
     
     if (sortBy === "seats") list.sort((a, b) => b.totalAvailable - a.totalAvailable);
     else list.sort((a, b) => a.distance - b.distance);
@@ -341,7 +343,7 @@ function LibraryCard({ library }: { library: LibraryWithDistance }) {
             </div>
           </div>
           <div className="mt-3 space-y-2">
-            {library.rooms.map((room) => {
+            {(library.rooms || []).map((room) => {
               const rc = getCongestionColor(room.congestionLevel);
               return (
                 <div key={room.name} className="flex items-center gap-2 text-xs">

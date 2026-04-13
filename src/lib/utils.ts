@@ -31,11 +31,12 @@ export function getCongestionLevel(percent: number): CongestionLevel {
 }
 
 /** 혼잡도에 따른 색상 클래스 */
-export function getCongestionColor(level: CongestionLevel) {
+export function getCongestionColor(level: CongestionLevel | string | undefined) {
   switch (level) {
     case "여유": return { bg: "bg-green-500", text: "text-green-600", light: "bg-green-100", border: "border-green-500" };
     case "보통": return { bg: "bg-amber-500", text: "text-amber-600", light: "bg-amber-100", border: "border-amber-500" };
     case "혼잡": return { bg: "bg-red-500", text: "text-red-600", light: "bg-red-100", border: "border-red-500" };
+    default: return { bg: "bg-slate-400", text: "text-slate-600", light: "bg-slate-100", border: "border-slate-400" };
   }
 }
 
