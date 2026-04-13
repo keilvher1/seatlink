@@ -16,9 +16,12 @@ export default function HomePage() {
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
   const [locationLoading, setLocationLoading] = useState(true);
   const [libraries, setLibraries] = useState<any[]>([]);
+  const [buses, setBuses] = useState<any[]>([]);
+  const [showBuses, setShowBuses] = useState(true);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapObjRef = useRef<any>(null);
   const markerLayerRef = useRef<any>(null);
+  const busLayerRef = useRef<any>(null);
   const userMarkerRef = useRef<any>(null);
 
   useEffect(() => {
@@ -33,6 +36,23 @@ export default function HomePage() {
     };
     fetchLibraries();
   }, []);
+
+  // 버스 실시간 위치 가져오기 (30초 간격 자동 새로고침)
+  useEffect(() => {
+    if (!userPos) return;
+    const fetchBuses = async () => {
+      try {
+        const res = await fetch(`/api/bus-realtime?lat=${userPos[0]}&lng=${userPos[1]}&radius=${radius}`);
+        const data = await res.json();
+        setBuses(data.buses || []);
+      } catch (err) {
+        console.error("Failed to fetch buses:", err);
+      }
+    };
+    fetchBuses();
+    const interval = setInterval(fetchBuses, 30000);
+    return () => clearInterval(interval);
+  }, [userPos, radius]);
 
   // Haversine formula to calculate distance between two coordinates
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -151,6 +171,7 @@ export default function HomePage() {
       const userMarker = L.marker(userPos, { icon: userIcon }).addTo(map);
       userMarkerRef.current = userMarker;
       markerLayerRef.current = L.layerGroup().addTo(map);
+      busLayerRef.current = L.layerGroup().addTo(map);
       mapObjRef.current = map;
       updateMarkers(L);
       setTimeout(() => {
@@ -197,6 +218,49 @@ export default function HomePage() {
       L.marker([lib.lat, lib.lng], { icon }).addTo(markerLayerRef.current);
     });
   };
+
+  // 버스 마커 업데이트
+  const updateBusMarkers = async (LParam?: any) => {
+    const L = LParam || (await import("leaflet")).default;
+    if (!busLayerRef.current) return;
+    busLayerRef.current.clearLayers();
+
+    if (!showBuses) return;
+
+    buses.forEach((bus: any) => {
+      const speedColor = bus.speed > 0 ? "#10b981" : "#6b7280";
+      const rotateStyle = `transform:rotate(${bus.direction || 0}deg)`;
+      const icon = L.divIcon({
+        html: `<div style="display:flex;flex-direction:column;align-items:center;">
+          <div style="width:32px;height:32px;background:${speedColor};border-radius:8px;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 2px 8px ${speedColor}88;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white" style="${rotateStyle}"><path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/></svg>
+          </div>
+          <div style="background:white;padding:0px 4px;border-radius:4px;margin-top:2px;box-shadow:0 1px 3px rgba(0,0,0,0.15);">
+            <span style="font-size:9px;font-weight:700;color:#334155;">${bus.rteNo || bus.vhclNo}</span>
+            ${bus.speed > 0 ? `<span style="font-size:8px;color:${speedColor};margin-left:2px;">${bus.speed}km/h</span>` : ''}
+          </div>
+        </div>`,
+        className: "", iconSize: [60, 50], iconAnchor: [30, 35],
+      });
+      const marker = L.marker([bus.lat, bus.lng], { icon }).addTo(busLayerRef.current);
+      marker.bindPopup(`
+        <div style="font-size:13px;min-width:150px;">
+          <b style="font-size:15px;">🚌 ${bus.rteNo || '노선 정보 없음'}</b><br/>
+          <span style="color:#666;">${bus.rteType || ''}</span><br/>
+          ${bus.stpnt && bus.edpnt ? `<span style="font-size:11px;">📍 ${bus.stpnt} → ${bus.edpnt}</span><br/>` : ''}
+          <span>🏎 속도: ${bus.speed}km/h</span><br/>
+          <span>📏 거리: ${bus.distance}km</span><br/>
+          ${bus.region ? `<span>📌 ${bus.region}</span>` : ''}
+        </div>
+      `);
+    });
+  };
+
+  // 버스 마커 업데이트 effect
+  useEffect(() => {
+    if (!mapObjRef.current) return;
+    updateBusMarkers();
+  }, [buses, showBuses]);
 
   // 반경·도서관목록·위치 변경 시 마커 업데이트 + 지도 줌 조정
   useEffect(() => {
@@ -274,6 +338,23 @@ export default function HomePage() {
             </button>
           ))}
         </div>
+
+        {/* Bus toggle button */}
+        <button
+          className={cn(
+            "absolute top-4 right-4 px-3 py-2 rounded-full backdrop-blur-md z-[1000] flex items-center gap-1.5 text-sm font-semibold transition-all duration-300 shadow-md",
+            showBuses
+              ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-emerald-500/30"
+              : "bg-white/80 text-slate-500 hover:shadow-lg"
+          )}
+          onClick={() => setShowBuses(!showBuses)}
+        >
+          <span>{"🚌"}</span>
+          <span>{showBuses ? "버스 ON" : "버스 OFF"}</span>
+          {showBuses && buses.length > 0 && (
+            <span className="px-1.5 py-0.5 bg-white/30 rounded-full text-xs">{buses.length}</span>
+          )}
+        </button>
 
         {/* My location button */}
         <button
