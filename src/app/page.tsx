@@ -192,17 +192,28 @@ export default function HomePage() {
     });
   };
 
+  // 반경 변경 시 지도 줌 레벨 자동 조정
+  useEffect(() => {
+    if (!mapObjRef.current || !userPos) return;
+
+    // 반경에 맞는 줌 레벨 계산
+    const radiusToZoom: Record<number, number> = { 5: 13, 10: 12, 30: 10, 100: 8 };
+    const zoom = radiusToZoom[radius] || 10;
+
+    if (sorted.length > 0) {
+      // 마커가 있으면 마커 + 유저 위치가 모두 보이도록 fitBounds
+      const points = [[userPos[0], userPos[1]], ...sorted.map((l: any) => [l.lat, l.lng])];
+      mapObjRef.current.fitBounds(points, { padding: [50, 50], maxZoom: zoom });
+    } else {
+      // 마커 없으면 유저 위치 중심으로 줌
+      mapObjRef.current.setView(userPos, zoom);
+    }
+  }, [radius, userPos]);
+
+  // 도서관 목록이나 폴백 상태가 변경되면 마커 업데이트
   useEffect(() => {
     if (!mapObjRef.current) return;
     updateMarkers();
-    // 폴백 모드일 때 가장 가까운 도서관이 보이도록 지도 범위 자동 조정
-    if (isFallback && sorted.length > 0 && userPos) {
-      const L = markerLayerRef.current ? window.L : null;
-      if (mapObjRef.current.fitBounds) {
-        const points = [[userPos[0], userPos[1]], ...sorted.map((l: any) => [l.lat, l.lng])];
-        mapObjRef.current.fitBounds(points, { padding: [50, 50], maxZoom: 10 });
-      }
-    }
   }, [sorted, isFallback]);
 
   return (
