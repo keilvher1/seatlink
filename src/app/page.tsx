@@ -217,8 +217,8 @@ export default function HomePage() {
       mapObjRef.current.fitBounds(points, { padding: [50, 50], maxZoom: zoom, animate: true });
     } else {
       // fallback(반경 내 도서관 없음)이거나 결과 없으면 유저 위치 중심으로 줌
-      console.log("[MAP] setView to", userPos, "zoom:", zoom);
-      mapObjRef.current.setView(userPos, zoom, { animate: true, duration: 0.5 });
+      console.log("[MAP] flyTo", userPos, "zoom:", zoom);
+      mapObjRef.current.flyTo(userPos, zoom, { duration: 0.8 });
     }
   }, [radius, sorted, userPos, isFallback]);
 
