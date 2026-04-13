@@ -214,12 +214,12 @@ export default function HomePage() {
     if (sorted.length > 0 && !isFallback) {
       // 반경 내 도서관이 있으면 마커 + 유저 위치가 모두 보이도록 fitBounds
       const points: [number, number][] = [[userPos[0], userPos[1]], ...sorted.map((l: any) => [l.lat, l.lng] as [number, number])];
-      map.fitBounds(points, { padding: [50, 50], maxZoom: zoom, animate: true });
+      map.fitBounds(points, { padding: [50, 50], maxZoom: zoom });
     } else {
       // fallback 모드: 유저 위치 중심으로 반경에 맞는 줌 적용
       // Leaflet은 같은 좌표+줌으로 setView 시 무시하므로 미세 오프셋 추가
       const offset = (Math.random() - 0.5) * 0.0001;
-      map.setView([userPos[0] + offset, userPos[1] + offset], zoom, { animate: true });
+      map.setView([userPos[0] + offset, userPos[1] + offset], zoom, { animate: false });
     }
   }, [radius, sorted, userPos, isFallback]);
 
@@ -260,7 +260,7 @@ export default function HomePage() {
                   const radiusToZoom: Record<number, number> = { 5: 13, 10: 12, 30: 10, 100: 8 };
                   const zoom = radiusToZoom[r] || 10;
                   const offset = (Math.random() - 0.5) * 0.0001;
-                  mapObjRef.current.setView([userPos[0] + offset, userPos[1] + offset], zoom, { animate: true });
+                  mapObjRef.current.setView([userPos[0] + offset, userPos[1] + offset], zoom, { animate: false });
                 }
               }}
               className={cn(
