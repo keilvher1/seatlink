@@ -70,10 +70,10 @@ export async function GET(request: NextRequest) {
 
     // 1) ê¸°ë³¸ì ë³´ ë§¤í
     for (const item of info.items) {
-      const id =
-        item.pblibId ||
-        item.lbrrySeCode ||
-        `${item.lcgvmnInstCd || "unknown"}_${item.pblibNm || ""}`;
+      // pblibId는 전국 중복(PLR001이 54개) → stdgCd+pblibId 복합키 사용
+      const id = item.stdgCd && item.pblibId
+        ? `${item.stdgCd}_${item.pblibId}`
+        : item.lbrrySeCode || `${item.lcgvmnInstCd || "unknown"}_${item.pblibNm || ""}`;
 
       if (!id) continue;
 
@@ -116,10 +116,9 @@ export async function GET(request: NextRequest) {
 
     // 2) ì´ìíí© ë§¤í
     for (const item of status.items) {
-      const id =
-        item.pblibId ||
-        item.lbrrySeCode ||
-        `${item.lcgvmnInstCd || "unknown"}_${item.pblibNm || ""}`;
+      const id = item.stdgCd && item.pblibId
+        ? `${item.stdgCd}_${item.pblibId}`
+        : item.lbrrySeCode || `${item.lcgvmnInstCd || "unknown"}_${item.pblibNm || ""}`;
 
       let lib = libraryMap.get(id);
 
@@ -165,10 +164,9 @@ export async function GET(request: NextRequest) {
 
     // 3) ì¤ìê° ì´ëì¤ ë§¤í
     for (const item of realtime.items) {
-      const id =
-        item.pblibId ||
-        item.lbrrySeCode ||
-        `${item.lcgvmnInstCd || "unknown"}_${item.pblibNm || ""}`;
+      const id = item.stdgCd && item.pblibId
+        ? `${item.stdgCd}_${item.pblibId}`
+        : item.lbrrySeCode || `${item.lcgvmnInstCd || "unknown"}_${item.pblibNm || ""}`;
 
       let lib = libraryMap.get(id);
 
@@ -212,7 +210,7 @@ export async function GET(request: NextRequest) {
           availableSeats: available,
           congestionPercent: pct,
           congestionLevel: pct < 40 ? "ì¬ì " : pct <= 70 ? "ë³´íµ" : ("í¼ì¡" as const),
-          lastUpdated: item.dataStdr || new Date().toISOString(),
+          lastUpdated: item.totDt || item.dataStdr || new Date().toISOString(),
         });
 
         lib.totalSeats = lib.rooms.reduce((s: number, r: any) => s + r.totalSeats, 0);
