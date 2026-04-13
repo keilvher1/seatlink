@@ -152,7 +152,7 @@ export default function HomePage() {
       userMarkerRef.current = userMarker;
       markerLayerRef.current = L.layerGroup().addTo(map);
       mapObjRef.current = map;
-      (window as any).__map = map; // debug: expose map to console
+      (window as any).__map = map;
       updateMarkers(L);
       setTimeout(() => {
         map.invalidateSize();
@@ -210,17 +210,16 @@ export default function HomePage() {
     const radiusToZoom: Record<number, number> = { 5: 13, 10: 12, 30: 10, 100: 8 };
     const zoom = radiusToZoom[radius] || 10;
 
-    console.log("[MAP] radius:", radius, "zoom:", zoom, "sorted:", sorted.length, "isFallback:", isFallback);
-
     const map = mapObjRef.current;
     if (sorted.length > 0 && !isFallback) {
       // 반경 내 도서관이 있으면 마커 + 유저 위치가 모두 보이도록 fitBounds
       const points: [number, number][] = [[userPos[0], userPos[1]], ...sorted.map((l: any) => [l.lat, l.lng] as [number, number])];
       map.fitBounds(points, { padding: [50, 50], maxZoom: zoom, animate: true });
     } else {
-      // fallback(반경 내 도서관 없음)이거나 결과 없으면 유저 위치 중심으로 줌
-      console.log("[MAP] setZoom", zoom, "current:", map.getZoom());
-      map.setZoom(zoom, { animate: true });
+      // fallback 모드: 유저 위치 중심으로 반경에 맞는 줌 적용
+      // Leaflet은 같은 좌표+줌으로 setView 시 무시하므로 미세 오프셋 추가
+      const offset = (Math.random() - 0.5) * 0.0001;
+      map.setView([userPos[0] + offset, userPos[1] + offset], zoom, { animate: true });
     }
   }, [radius, sorted, userPos, isFallback]);
 
