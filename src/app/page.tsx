@@ -55,10 +55,10 @@ export default function HomePage() {
     return `${Math.round(distance)}km`;
   };
 
-  const sorted = useMemo(() => {
-    if (!userPos) return [];
-    
-    const list = libraries
+  const { sorted, isFallback } = useMemo(() => {
+    if (!userPos) return { sorted: [], isFallback: false };
+
+    const allWithDist = libraries
       .filter((lib) => lib.lat && lib.lng && lib.lat !== 0 && lib.lng !== 0)
       .map((lib) => {
         const distance = calculateDistance(userPos[0], userPos[1], lib.lat, lib.lng);
@@ -67,11 +67,22 @@ export default function HomePage() {
           distance,
           distanceText: getDistanceText(distance),
         };
-      }).filter((l) => l.distance <= radius && isFinite(l.distance));
-    
+      })
+      .filter((l) => isFinite(l.distance))
+      .sort((a, b) => a.distance - b.distance);
+
+    let list = allWithDist.filter((l) => l.distance <= radius);
+    let fallback = false;
+
+    // 반경 내 도서관이 없으면 가장 가까운 5개를 보여줌
+    if (list.length === 0 && allWithDist.length > 0) {
+      list = allWithDist.slice(0, 5);
+      fallback = true;
+    }
+
     if (sortBy === "seats") list.sort((a, b) => b.totalAvailable - a.totalAvailable);
-    else list.sort((a, b) => a.distance - b.distance);
-    return list;
+    else if (!fallback) list.sort((a, b) => a.distance - b.distance);
+    return { sorted: list, isFallback: fallback };
   }, [radius, sortBy, userPos, libraries]);
 
   const requestGeolocation = () => {
@@ -184,7 +195,15 @@ export default function HomePage() {
   useEffect(() => {
     if (!mapObjRef.current) return;
     updateMarkers();
-  }, [sorted]);
+    // 폴백 모드일 때 가장 가까운 도서관이 보이도록 지도 범위 자동 조정
+    if (isFallback && sorted.length > 0 && userPos) {
+      const L = markerLayerRef.current ? window.L : null;
+      if (mapObjRef.current.fitBounds) {
+        const points = [[userPos[0], userPos[1]], ...sorted.map((l: any) => [l.lat, l.lng])];
+        mapObjRef.current.fitBounds(points, { padding: [50, 50], maxZoom: 10 });
+      }
+    }
+  }, [sorted, isFallback]);
 
   return (
     <div className="relative h-[calc(100vh-56px)] overflow-hidden">
@@ -293,12 +312,20 @@ export default function HomePage() {
             </div>
           ))}
 
-          {sorted.length === 0 && (
+          {isFallback && (
+            <div className="text-center py-3 px-4 mb-2 bg-amber-50 border border-amber-200 rounded-xl">
+              <p className="text-sm font-medium text-amber-700">
+                {"반경 "}{radius}{"km 내 도서관이 없어 가장 가까운 도서관을 보여드립니다"}
+              </p>
+            </div>
+          )}
+
+          {sorted.length === 0 && !isFallback && (
             <div className="text-center py-12 text-slate-400 relative">
               <Particles className="absolute inset-0" quantity={20} color="#94a3b8" size={0.8} />
-              <p className="text-5xl mb-3 animate-float">{"\uD83D\uDD0D"}</p>
-              <p className="font-bold text-slate-600">{"\uBC18\uACBD"} {radius}{"km \uB0B4 \uB3C4\uC11C\uAD00\uC774 \uC5C6\uC2B5\uB2C8\uB2E4"}</p>
-              <p className="text-sm mt-2 text-slate-500">{"\uAC80\uC0C9 \uBC18\uACBD\uC744 \uB113\uD600\uBCF4\uC138\uC694"}</p>
+              <p className="text-5xl mb-3 animate-float">{"🔍"}</p>
+              <p className="font-bold text-slate-600">{"도서관 정보를 불러오는 중입니다..."}</p>
+              <p className="text-sm mt-2 text-slate-500">{"잠시만 기다려주세요"}</p>
             </div>
           )}
 
