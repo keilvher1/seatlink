@@ -253,7 +253,16 @@ export default function HomePage() {
           {[5, 10, 30, 100].map((r, idx) => (
             <button
               key={r}
-              onClick={() => setRadius(r)}
+              onClick={() => {
+                setRadius(r);
+                // 직접 줌 변경 (useEffect가 즉시 반영 안 될 수 있으므로)
+                if (mapObjRef.current && userPos) {
+                  const radiusToZoom: Record<number, number> = { 5: 13, 10: 12, 30: 10, 100: 8 };
+                  const zoom = radiusToZoom[r] || 10;
+                  const offset = (Math.random() - 0.5) * 0.0001;
+                  mapObjRef.current.setView([userPos[0] + offset, userPos[1] + offset], zoom, { animate: true });
+                }
+              }}
               className={cn(
                 "px-4 py-2 text-sm font-semibold rounded-full backdrop-blur-md transition-all duration-300 transform",
                 radius === r
