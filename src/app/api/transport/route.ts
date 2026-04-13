@@ -265,6 +265,23 @@ export async function GET(request: NextRequest) {
 
     await Promise.all(promises);
 
+    // 모든 실 API가 빈 데이터를 반환하면 mock fallback
+    const hasRealData =
+      result.bikes.length > 0 ||
+      result.buses.length > 0 ||
+      result.accessibleTransport !== null;
+
+    if (!hasRealData) {
+      console.warn("[Transport] All APIs returned empty, using mock fallback");
+      return NextResponse.json({
+        bikes: getMockBikes(userLat, userLng),
+        buses: getMockBuses(),
+        accessibleTransport: getMockAccessible(),
+        source: "mock-fallback",
+        updatedAt: new Date().toISOString(),
+      });
+    }
+
     return NextResponse.json(result, {
       headers: {
         "Cache-Control": "public, max-age=60, stale-while-revalidate=120",
