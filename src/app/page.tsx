@@ -152,6 +152,7 @@ export default function HomePage() {
       userMarkerRef.current = userMarker;
       markerLayerRef.current = L.layerGroup().addTo(map);
       mapObjRef.current = map;
+      (window as any).__map = map; // debug: expose map to console
       updateMarkers(L);
       setTimeout(() => {
         map.invalidateSize();
