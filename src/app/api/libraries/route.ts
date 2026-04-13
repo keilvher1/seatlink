@@ -22,14 +22,14 @@ export async function GET(request: NextRequest) {
   try {
     console.log("[Libraries] Fetching from data.go.kr APIs...");
 
-    // 3ê° APIë¥¼ ë³ë ¬ë¡ í¸ì¶
+    // 3개 API를 병렬로 호출
     const [infoRes, statusRes, realtimeRes] = await Promise.allSettled([
       fetchLibraryInfo(stdgCd),
       fetchLibraryStatus(stdgCd),
       fetchLibraryRealtime(stdgCd),
     ]);
 
-    // settled ê²°ê³¼ìì ìì íê² ì¶ì¶
+    // settled 결과에서 안전하게 추출
     const info = infoRes.status === "fulfilled" ? infoRes.value : { items: [], totalCount: 0 };
     const status = statusRes.status === "fulfilled" ? statusRes.value : { items: [], totalCount: 0 };
     const realtime = realtimeRes.status === "fulfilled" ? realtimeRes.value : { items: [], totalCount: 0 };
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       `[Libraries] API results - info: ${info.items.length}, status: ${status.items.length}, realtime: ${realtime.items.length}`
     );
 
-    // íëë ë°ì´í°ê° ìì¼ë©´ ë¹ ë°°ì´ ë°í
+    // 하나도 데이터가 없으면 빈 배열 반환
     if (info.items.length === 0 && status.items.length === 0 && realtime.items.length === 0) {
       console.warn("[Libraries] All APIs returned empty, using fallback mock data");
       return NextResponse.json({
@@ -65,10 +65,10 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // ë°ì´í° ë³í©: ëìê´ ID ê¸°ì¤
+    // 데이터 병합: 도서관 ID 기준
     const libraryMap = new Map<string, any>();
 
-    // 1) ê¸°ë³¸ì ë³´ ë§¤í
+    // 1) 기본정보 매핑
     for (const item of info.items) {
       // pblibId는 전국 중복(PLR001이 54개) → stdgCd+pblibId 복합키 사용
       const id = item.stdgCd && item.pblibId
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
         operatingHours: {
           weekday: `${weekdayStart}~${weekdayEnd}`,
           saturday: `${satStart}~${satEnd}`,
-          holiday: holStart ? `${holStart}~${holEnd}` : "í´ê´",
+          holiday: holStart ? `${holStart}~${holEnd}` : "휴관",
         },
         nightOperation: parseInt(weekdayEnd.replace(":", "")) >= 2100,
         accessible: true,
@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
         parking: item.parkngLotCo ? parseInt(item.parkngLotCo) > 0 : false,
         todayVisitors: 0,
         seatUsageRate: 0,
-        congestionLevel: "ì¬ì " as const,
+        congestionLevel: "여유" as const,
         rooms: [] as any[],
         totalSeats: parseInt(item.tseatCnt || item.totalSeatCo || "0") || 0,
         totalUsed: 0,
@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 2) ì´ìíí© ë§¤í
+    // 2) 운영현황 매핑
     for (const item of status.items) {
       const id = item.stdgCd && item.pblibId
         ? `${item.stdgCd}_${item.pblibId}`
@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
           parking: false,
           todayVisitors: 0,
           seatUsageRate: 0,
-          congestionLevel: "ì¬ì " as const,
+          congestionLevel: "여유" as const,
           rooms: [] as any[],
           totalSeats: 0,
           totalUsed: 0,
@@ -153,16 +153,16 @@ export async function GET(request: NextRequest) {
         lib.reservable = item.rsvtPsbltyYn === "Y" || item.reservationAt === "Y";
 
         const operStatus = item.operSttsNm || item.operSttus || "";
-        if (operStatus === "í´ê´" || operStatus === "ììí´ê´") {
-          lib.congestionLevel = "ì¬ì ";
+        if (operStatus === "휴관" || operStatus === "임시휴관") {
+          lib.congestionLevel = "여유";
         } else {
           const rate = lib.seatUsageRate;
-          lib.congestionLevel = rate < 40 ? "ì¬ì " : rate <= 70 ? "ë³´íµ" : "í¼ì¡";
+          lib.congestionLevel = rate < 40 ? "여유" : rate <= 70 ? "보통" : "혼잡";
         }
       }
     }
 
-    // 3) ì¤ìê° ì´ëì¤ ë§¤í
+    // 3) 실시간 열람실 매핑
     for (const item of realtime.items) {
       const id = item.stdgCd && item.pblibId
         ? `${item.stdgCd}_${item.pblibId}`
@@ -186,7 +186,7 @@ export async function GET(request: NextRequest) {
           parking: false,
           todayVisitors: 0,
           seatUsageRate: 0,
-          congestionLevel: "ì¬ì " as const,
+          congestionLevel: "여유" as const,
           rooms: [] as any[],
           totalSeats: 0,
           totalUsed: 0,
@@ -204,12 +204,12 @@ export async function GET(request: NextRequest) {
         const pct = total > 0 ? Math.round((used / total) * 100) : 0;
 
         lib.rooms.push({
-          name: item.rdrmNm || item.roomNm || "ì´ëì¤",
+          name: item.rdrmNm || item.roomNm || "열람실",
           totalSeats: total,
           usedSeats: used,
           availableSeats: available,
           congestionPercent: pct,
-          congestionLevel: pct < 40 ? "ì¬ì " : pct <= 70 ? "ë³´íµ" : ("í¼ì¡" as const),
+          congestionLevel: pct < 40 ? "여유" : pct <= 70 ? "보통" : ("혼잡" as const),
           lastUpdated: item.totDt || item.dataStdr || new Date().toISOString(),
         });
 
@@ -220,7 +220,7 @@ export async function GET(request: NextRequest) {
         if (lib.totalSeats > 0) {
           lib.seatUsageRate = Math.round((lib.totalUsed / lib.totalSeats) * 100);
           lib.congestionLevel =
-            lib.seatUsageRate < 40 ? "ì¬ì " : lib.seatUsageRate <= 70 ? "ë³´íµ" : "í¼ì¡";
+            lib.seatUsageRate < 40 ? "여유" : lib.seatUsageRate <= 70 ? "보통" : "혼잡";
         }
       }
     }
