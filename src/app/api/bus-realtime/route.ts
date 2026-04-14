@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTagoBusesByRoutes, type TagoBusLocation } from "@/lib/tago";
 import { TAGO_TRACKED_ROUTES } from "@/lib/tago-routes";
 import { collectNearbyRoutes } from "@/lib/tago-stations";
+import { buildCoverage } from "@/lib/service-area";
 
 /**
  * 버스 실시간 위치 API (전국)
@@ -161,6 +162,23 @@ export async function GET(request: NextRequest) {
     });
   }
 
+  // 지원 지역 화이트리스트 체크 — 미지원 좌표는 원거리 데이터 오인 표시 방지를 위해
+  // 즉시 빈 결과를 반환하고 가장 가까운 서비스 가능 도시를 안내한다.
+  const coverage = buildCoverage(userLat, userLng);
+  if (!coverage.supported) {
+    return NextResponse.json(
+      {
+        buses: [],
+        totalAvailable: 0,
+        sources: { rte: 0, tago: 0, tagoRoutesTracked: 0, tagoRoutesDynamic: 0 },
+        coverage,
+        source: "out-of-area",
+        updatedAt: new Date().toISOString(),
+      },
+      { headers: { "Cache-Control": "public, max-age=300" } }
+    );
+  }
+
   try {
     // 0) 사용자 위치 주변 노선 자동 수집 (정류소정보 API)
     //    → TAGO 버스위치조회에 필요한 routeId 목록을 동적으로 확보
@@ -269,6 +287,7 @@ export async function GET(request: NextRequest) {
         tagoRoutesTracked: TAGO_TRACKED_ROUTES.length,
         tagoRoutesDynamic: dynamicRoutes.length,
       },
+      coverage,
       source: "api",
       updatedAt: new Date().toISOString(),
     }, {

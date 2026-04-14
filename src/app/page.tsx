@@ -18,6 +18,11 @@ export default function HomePage() {
   const [libraries, setLibraries] = useState<any[]>([]);
   const [buses, setBuses] = useState<any[]>([]);
   const [bikes, setBikes] = useState<any[]>([]);
+  const [coverage, setCoverage] = useState<{
+    supported: boolean;
+    region: string | null;
+    nearest?: Array<{ name: string; distanceKm: number; centerLat: number; centerLng: number }>;
+  } | null>(null);
   const [showBuses, setShowBuses] = useState(true);
   const [showBikes, setShowBikes] = useState(true);
   const mapRef = useRef<HTMLDivElement>(null);
@@ -48,6 +53,7 @@ export default function HomePage() {
         const res = await fetch(`/api/bus-realtime?lat=${userPos[0]}&lng=${userPos[1]}&radius=${radius}`);
         const data = await res.json();
         setBuses(data.buses || []);
+        if (data.coverage) setCoverage(data.coverage);
       } catch (err) {
         console.error("Failed to fetch buses:", err);
       }
@@ -400,6 +406,30 @@ export default function HomePage() {
             </button>
           ))}
         </div>
+
+        {/* 미지원 지역 안내 배너 */}
+        {coverage && !coverage.supported && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] max-w-md w-[90%]">
+            <div className="bg-amber-50/95 backdrop-blur-md border border-amber-300 rounded-xl shadow-lg px-4 py-3 text-sm">
+              <div className="flex items-start gap-2">
+                <span className="text-lg">⚠️</span>
+                <div className="flex-1">
+                  <p className="font-semibold text-amber-900">
+                    이 지역은 실시간 버스·공영자전거 데이터가 제공되지 않습니다
+                  </p>
+                  {coverage.nearest && coverage.nearest.length > 0 && (
+                    <p className="text-amber-800 mt-1 text-xs">
+                      가까운 지원 도시:{" "}
+                      {coverage.nearest
+                        .map((n) => `${n.name} (${n.distanceKm}km)`)
+                        .join(", ")}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Transport toggle buttons */}
         <div className="absolute top-4 right-4 flex flex-col gap-2 z-[1000]">

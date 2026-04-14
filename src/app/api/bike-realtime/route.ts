@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildCoverage } from "@/lib/service-area";
 
 /**
  * 공영자전거 실시간 API
@@ -134,6 +135,21 @@ export async function GET(request: NextRequest) {
     });
   }
 
+  // 지원 지역 화이트리스트: 미지원 좌표면 빈 결과 + 안내
+  const coverage = buildCoverage(userLat, userLng);
+  if (!coverage.supported) {
+    return NextResponse.json(
+      {
+        bikes: [],
+        totalStations: 0,
+        coverage,
+        source: "out-of-area",
+        updatedAt: new Date().toISOString(),
+      },
+      { headers: { "Cache-Control": "public, max-age=300" } }
+    );
+  }
+
   try {
     const [stations, availMap] = await Promise.all([
       getAllStations(),
@@ -171,6 +187,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       bikes: nearbyBikes,
       totalStations: stations.length,
+      coverage,
       source: "api",
       updatedAt: new Date().toISOString(),
     }, {
