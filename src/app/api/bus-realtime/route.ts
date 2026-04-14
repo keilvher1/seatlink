@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getTagoBusesByRoutes, type TagoBusLocation } from "@/lib/tago";
+import { TAGO_TRACKED_ROUTES } from "@/lib/tago-routes";
 
 /**
  * 버스 실시간 위치 API (전국)
- * 초정밀 GPS 기반 전국 버스 위치 정보 (약 33,000대)
  *
- * - 실시간 위치: 1분 메모리 캐시 (34페이지 병렬 호출)
- * - 노선 마스터: 5분 메모리 캐시 (3페이지)
- * - data.go.kr numOfRows 최대 1000 제한 → 페이지네이션
+ * 데이터 소스 2개 병합:
+ *   1) B551982/rte (초정밀버스) — 전국 34페이지 페이지네이션, 약 33,000대
+ *      커버: 울산, 충주, 제천, 목포, 여수, 무안, 함평, 구미, 창원, 함양, 춘천 등
+ *   2) 1613000/BusLcInfoInqireService (TAGO) — 노선별 조회
+ *      커버: 부산(21), 대구(22), 인천(23), 광주(24), 대전(25), 세종(12), 제주(39), 수도권 등
+ *      ⚠️ routeId 필수 → src/lib/tago-routes.ts 에 노선 등록 필요
  *
  * Query params:
  *   lat, lng  — 사용자 좌표 (필수)
@@ -157,13 +161,20 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const [allBuses, routeMap] = await Promise.all([
+    // 두 데이터 소스 병렬 조회
+    const [allBuses, routeMap, tagoBuses] = await Promise.all([
       getAllBusLocations(),
       getRouteMap(),
+      TAGO_TRACKED_ROUTES.length > 0
+        ? getTagoBusesByRoutes(TAGO_TRACKED_ROUTES).catch((err) => {
+            console.error("[TAGO] fetch failed:", err.message);
+            return [] as TagoBusLocation[];
+          })
+        : Promise.resolve([] as TagoBusLocation[]),
     ]);
 
-    // 사용자 주변 버스 필터링
-    const nearbyBuses = allBuses
+    // 1) rte API 버스 → 공통 포맷
+    const rteBuses = allBuses
       .map((bus: any) => {
         const lat = parseFloat(bus.lat || "0");
         const lng = parseFloat(bus.lot || "0");
@@ -189,15 +200,58 @@ export async function GET(request: NextRequest) {
           stpnt: route.stpnt || "",
           edpnt: route.edpnt || "",
           lastUpdate: bus.gthrDt || "",
+          source: "rte" as const,
         };
       })
-      .filter(Boolean)
+      .filter(Boolean) as any[];
+
+    // 2) TAGO 버스 → 공통 포맷
+    const tagoFormatted = tagoBuses
+      .map((b) => {
+        if (!b.gpslati || !b.gpslong) return null;
+        const dist = haversine(userLat, userLng, b.gpslati, b.gpslong);
+        if (dist > radiusKm) return null;
+        return {
+          vhclNo: b.vehicleno,
+          rteId: "",
+          rteNo: b.routenm,
+          rteType: b.routetp,
+          lat: b.gpslati,
+          lng: b.gpslong,
+          speed: 0, // TAGO는 속도 미제공
+          direction: 0,
+          distance: Math.round(dist * 100) / 100,
+          region: "",
+          stpnt: "",
+          edpnt: b.nodenm, // 접근 정류소명
+          lastUpdate: new Date().toISOString(),
+          source: "tago" as const,
+        };
+      })
+      .filter(Boolean) as any[];
+
+    // 3) 병합 + 차량번호 기준 중복 제거
+    const merged = [...rteBuses, ...tagoFormatted];
+    const seen = new Set<string>();
+    const deduped = merged.filter((b) => {
+      const key = b.vhclNo || `${b.lat},${b.lng}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    const nearbyBuses = deduped
       .sort((a: any, b: any) => a.distance - b.distance)
       .slice(0, 50);
 
     return NextResponse.json({
       buses: nearbyBuses,
-      totalAvailable: allBuses.length,
+      totalAvailable: allBuses.length + tagoBuses.length,
+      sources: {
+        rte: rteBuses.length,
+        tago: tagoFormatted.length,
+        tagoRoutesTracked: TAGO_TRACKED_ROUTES.length,
+      },
       source: "api",
       updatedAt: new Date().toISOString(),
     }, {
