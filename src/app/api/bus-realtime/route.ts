@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTagoBusesByRoutes, type TagoBusLocation } from "@/lib/tago";
 import { TAGO_TRACKED_ROUTES } from "@/lib/tago-routes";
+import { collectNearbyRoutes } from "@/lib/tago-stations";
 
 /**
  * 버스 실시간 위치 API (전국)
@@ -161,12 +162,27 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // 두 데이터 소스 병렬 조회
+    // 0) 사용자 위치 주변 노선 자동 수집 (정류소정보 API)
+    //    → TAGO 버스위치조회에 필요한 routeId 목록을 동적으로 확보
+    const dynamicRoutesPromise = collectNearbyRoutes(userLat, userLng, 10, 30)
+      .catch((err) => {
+        console.error("[TAGO STN] collectNearbyRoutes failed:", err.message);
+        return [] as Array<{ cityCode: number; routeId: string; routeNo: string }>;
+      });
+
+    // 동적 노선 + 정적 추적 노선 합침
+    const dynamicRoutes = await dynamicRoutesPromise;
+    const tagoRoutes = [
+      ...TAGO_TRACKED_ROUTES.map((r) => ({ cityCode: Number(r.cityCode), routeId: r.routeId })),
+      ...dynamicRoutes.map((r) => ({ cityCode: r.cityCode, routeId: r.routeId })),
+    ];
+
+    // 세 데이터 소스 병렬 조회
     const [allBuses, routeMap, tagoBuses] = await Promise.all([
       getAllBusLocations(),
       getRouteMap(),
-      TAGO_TRACKED_ROUTES.length > 0
-        ? getTagoBusesByRoutes(TAGO_TRACKED_ROUTES).catch((err) => {
+      tagoRoutes.length > 0
+        ? getTagoBusesByRoutes(tagoRoutes).catch((err) => {
             console.error("[TAGO] fetch failed:", err.message);
             return [] as TagoBusLocation[];
           })
@@ -251,6 +267,7 @@ export async function GET(request: NextRequest) {
         rte: rteBuses.length,
         tago: tagoFormatted.length,
         tagoRoutesTracked: TAGO_TRACKED_ROUTES.length,
+        tagoRoutesDynamic: dynamicRoutes.length,
       },
       source: "api",
       updatedAt: new Date().toISOString(),
